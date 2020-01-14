@@ -1,0 +1,23 @@
+name: make custom debian-cloud-images
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: install required packages
+        run: sudo apt update && sudo apt install --no-install-recommends ca-certificates debsums dosfstools fai-server fai-setup-storage make python3 python3-libcloud python3-marshmallow python3-pytest qemu-utils udev
+
+      - name: git clone debian-cloud-images
+        run: git clone --depth=1 https://salsa.debian.org/cloud-team/debian-cloud-images.git /tmp/debian-cloud-images
+
+      - name: building
+        run: |
+          cd /tmp/debian-cloud-images
+          make image-buster-genericcloud-amd64
+
+      - name: ls
+        run: ls -lh /tmp/debian-cloud-images/image-buster-genericcloud-amd64*
