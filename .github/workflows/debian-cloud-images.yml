@@ -14,12 +14,6 @@ jobs:
       - name: git clone
         run: git clone --depth=1 https://salsa.debian.org/cloud-team/debian-cloud-images.git /tmp/dci
 
-      - name: python install
-        run: |
-          cd /tmp/dci
-          python setup.py build
-          python setup.py install
-
       - name: build
         run: |
           cd /tmp/dci
