@@ -11,11 +11,11 @@ jobs:
       - name: fast sources.list
         run: sudo sed -i '/src/d' /etc/apt/sources.list && sudo rm -rf /etc/apt/sources.list.d
 
-      - name: Install python3-diskimage-builder
-        run: sudo pip3 --no-cache-dir install diskimage-builder
-
       - name: Install required packages
         run: sudo apt update && sudo apt install -y debootstrap kpartx qemu-system-x86
 
-      - name: Build sid.cmp.img
+      - name: Install python3-diskimage-builder
+        run: sudo pip3 --no-cache-dir install diskimage-builder
+
+      - name: Build sid.qcow2
         run: sudo /bin/bash dib/sid.sh
