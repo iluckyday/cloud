@@ -93,12 +93,12 @@ DIB_DEV_USER_PASSWORD=debian \
 DIB_DEV_USER_SHELL=/bin/bash \
 DIB_DEV_USER_PWDLESS_SUDO=yes \
 DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
-disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"`.cmp.img vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
+disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"` vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
 
-ls -lh /dev/shm/sid-*.cmp.img
+ls -lh /dev/shm/sid-*.qcow2
 
 ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
 chmod +x /tmp/ffsend
 
-/tmp/ffsend -Ifyq upload /dev/shm/sid-*.cmp.img
+/tmp/ffsend -Ifyq upload /dev/shm/sid-*.qcow2
