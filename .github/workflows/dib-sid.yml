@@ -19,6 +19,3 @@ jobs:
 
       - name: Build sid.cmp.img
         run: sudo /bin/bash dib/sid.sh
-
-      - name: ls
-        run: ls -lh /dev/shm/sid-*.cmp.img

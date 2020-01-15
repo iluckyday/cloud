@@ -77,7 +77,7 @@ sed -i 's/4096/16384 -O ^has_journal/' `python3 -c "import os,diskimage_builder;
 
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' `python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))"`/elements/debian-minimal/package-installs.yaml
 
-DIB_QUIET=1 \
+#DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
