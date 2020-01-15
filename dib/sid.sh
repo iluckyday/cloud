@@ -75,9 +75,10 @@ sed -i 's/python//' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-mini
 sed -i '/lsb-release/{n;d}' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 sed -i '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
+cat "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml "$PY_DIB_PATH"/elements/*/*/*-bootloader "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 
 DIB_QUIET=1 \
-#DIB_DEBUG_TRACE=1 \
+DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
