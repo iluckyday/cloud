@@ -13,12 +13,11 @@ find ${basedir}/files -type f -exec bash -c 'dirname {} | sed -e "s@${basedir}/f
 
 sudo touch $TARGET_ROOT/home/${DIB_DEV_USER_USERNAME}/.hushlogin
 echo -e "\n\nexport HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null"| sudo tee -a $TARGET_ROOT/home/${DIB_DEV_USER_USERNAME}/.bashrc
-echo debian | sudo tee $TARGET_ROOT/etc/hostname
 echo -e "\n\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | sudo tee -a $TARGET_ROOT/etc/sysctl.conf
-sed -i '/src/d' $TARGET_ROOT/etc/apt/sources.list
 
 sudo chroot $TARGET_ROOT systemctl enable systemd-networkd
-sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer apt-daily-upgrade.timer fstrim.timer motd-news.timer
+sudo chroot $TARGET_ROOT systemctl disable e2scrub_reap.service
+sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
 
 sudo chroot $TARGET_ROOT chown debian:debian /home/debian/.hushlogin
 sudo chroot $TARGET_ROOT apt remove --purge -y python* libpython* 
@@ -70,7 +69,7 @@ EOF
 PY_DIB_PATH=$(python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))")
 sed -i 's/4096/16384 -O ^has_journal/' "$PY_DIB_PATH"/lib/disk-image-create
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml
-sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' "$PY_DIB_PATH"/elements/*/*/*-bootloader
+sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/*/*/*-bootloader
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
 sed -i '/lsb-release/{n;d}' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 sed -i '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
