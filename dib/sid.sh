@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 WORKDIR=/tmp/sid
 
@@ -72,7 +72,7 @@ sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/de
 sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' "$PY_DIB_PATH"/elements/*/*/*-bootloader
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking ,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
-#DIB_QUIET=1 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
