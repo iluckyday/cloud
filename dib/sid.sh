@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 set -e
 
 WORKDIR=/tmp/sid
@@ -20,7 +20,7 @@ sed -i '/src/d' $TARGET_ROOT/etc/apt/sources.list
 sudo chroot $TARGET_ROOT systemctl enable systemd-networkd
 sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer apt-daily-upgrade.timer fstrim.timer motd-news.timer
 
-sudo chroot $TARGET_ROOT apt remove --purge -y python* 
+sudo chroot $TARGET_ROOT apt remove --purge -y python* libpython* 
 
 sudo rm -rf $TARGET_ROOT/etc/dib-manifests $TARGET_ROOT/var/log/* $TARGET_ROOT/usr/share/doc/* $TARGET_ROOT/usr/share/local/doc/* $TARGET_ROOT/usr/share/man/* $TARGET_ROOT/tmp/* $TARGET_ROOT/var/tmp/* $TARGET_ROOT/var/cache/apt/*
 sudo find $TARGET_ROOT/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
@@ -76,8 +76,7 @@ sed -i '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yam
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
 DIB_QUIET=1 \
-#DIB_DEBUG_TRACE=1 \
-DIB_IMAGE_SIZE=20 \
+DIB_IMAGE_SIZE=10 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
 ELEMENTS_PATH=$WORKDIR/elements \
@@ -91,9 +90,7 @@ DIB_DEV_USER_PASSWORD=debian \
 DIB_DEV_USER_SHELL=/bin/bash \
 DIB_DEV_USER_PWDLESS_SUDO=yes \
 DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
-disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"` vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
-
-ls -lh /dev/shm/sid-*.qcow2
+disk-image-create -o /dev/shm/sid-`date "+%Y%m%d%H%M%S"` vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
 
 ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
