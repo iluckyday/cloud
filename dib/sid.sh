@@ -20,6 +20,7 @@ sed -i '/src/d' $TARGET_ROOT/etc/apt/sources.list
 sudo chroot $TARGET_ROOT systemctl enable systemd-networkd
 sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer apt-daily-upgrade.timer fstrim.timer motd-news.timer
 
+sudo chroot $TARGET_ROOT chown debian:debian /home/debian/.hushlogin
 sudo chroot $TARGET_ROOT apt remove --purge -y python* libpython* 
 
 sudo rm -rf $TARGET_ROOT/etc/dib-manifests $TARGET_ROOT/var/log/* $TARGET_ROOT/usr/share/doc/* $TARGET_ROOT/usr/share/local/doc/* $TARGET_ROOT/usr/share/man/* $TARGET_ROOT/tmp/* $TARGET_ROOT/var/tmp/* $TARGET_ROOT/var/cache/apt/*
