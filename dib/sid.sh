@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 WORKDIR=/tmp/sid
 
@@ -73,9 +73,11 @@ sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' "$PY_DIB_PATH"/elemen
 sed -i -e '/gnupg/d' -e 's/python//' -e 's/python3//' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
 sed -i -e '/lsb-release/{n;d}' -e '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
+cat  "$PY_DIB_PATH"/lib/disk-image-create "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml "$PY_DIB_PATH"/elements/*/*/*-bootloader "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
+exit 0
 
-#DIB_QUIET=1 \
-DIB_DEBUG_TRACE=1 \
+DIB_QUIET=1 \
+#DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
