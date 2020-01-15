@@ -5,13 +5,6 @@ WORKDIR=/tmp/sid
 
 mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{extra-data.d,cleanup.d}
 
-cat << "EOF" > $WORKDIR/elements/diy/extra-data.d/99-zz-diy
-#!/bin/bash
-sudo rm -f $TMP_HOOKS_PATH/*/*-cloud-init $TMP_HOOKS_PATH/*/*-debian-networking $TMP_HOOKS_PATH/*/*-baseline-environment
-sudo sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' $TMP_HOOKS_PATH/*/*-bootloader
-EOF
-chmod +x $WORKDIR/elements/diy/extra-data.d/99-zz-diy
-
 cat << "EOF" > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
 #!/bin/bash
 export TARGET_ROOT
@@ -32,12 +25,12 @@ sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer apt-daily-upgrade.tim
 sudo rm -rf $TARGET_ROOT/etc/dib-manifests $TARGET_ROOT/var/log/* $TARGET_ROOT/usr/share/doc/* $TARGET_ROOT/usr/share/man/* $TARGET_ROOT/tmp/* $TARGET_ROOT/var/tmp/* $TARGET_ROOT/var/cache/apt/*
 sudo find $TARGET_ROOT/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
 EOF
-
 chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
 
 cat << EOF > $WORKDIR/files/etc/fstab
-LABEL=cloudimg-rootfs /    ext4  defaults,noatime                            0 0
-tmpfs                 /tmp tmpfs mode=1777,strictatime,nosuid,nodev,size=90% 0 0
+LABEL=cloudimg-rootfs /         ext4  defaults,noatime                            0 0
+tmpfs                 /tmp      tmpfs mode=1777,strictatime,nosuid,nodev,size=90% 0 0
+tmpfs                 /var/log  tmpfs   rw,relatime                               0 0
 EOF
 
 cat << EOF > $WORKDIR/files/etc/apt/apt.conf.d/99-freedisk
@@ -73,9 +66,11 @@ Name=en*
 DHCP=ipv4
 EOF
 
-sed -i 's/4096/16384 -O ^has_journal/' `python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))"`/lib/disk-image-create
-
-sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' `python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))"`/elements/debian-minimal/package-installs.yaml
+PY_DIB_PATH=$(python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))")
+sed -i 's/4096/16384 -O ^has_journal/' "$PY_DIB_PATH"/lib/disk-image-create
+sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml
+sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' "$PY_DIB_PATH"/elements/*/*/*-bootloader
+rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking ,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
 #DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
@@ -84,10 +79,9 @@ DIB_EXTLINUX=1 \
 ELEMENTS_PATH=$WORKDIR/elements \
 DIB_IMAGE_CACHE=/dev/shm \
 DIB_RELEASE=unstable \
+DIB_DEBIAN_COMPONENTS=main,contrib,non-free \
 DIB_APT_MINIMAL_CREATE_INTERFACES=0 \
 DIB_DEBOOTSTRAP_EXTRA_ARGS+=" --no-check-gpg" \
-DIB_DEBOOTSTRAP_EXTRA_ARGS+=" --include=bash-completion,iproute2" \
-DIB_DEBOOTSTRAP_EXTRA_ARGS+=" --exclude=unattended-upgrades" \
 DIB_DEV_USER_USERNAME=debian \
 DIB_DEV_USER_PASSWORD=debian \
 DIB_DEV_USER_SHELL=/bin/bash \
