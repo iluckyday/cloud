@@ -1,9 +1,7 @@
 #!/bin/bash
 set -e
 
-WORKDIR=$(mktemp -t -d sid-XXXX)
-chmod 755 $WORKDIR
-mount -t tmpfs -o size=80% tmpfs $WORKDIR
+WORKDIR=/tmp/sid
 
 mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{extra-data.d,cleanup.d}
 
@@ -79,12 +77,12 @@ sed -i 's/4096/16384 -O ^has_journal/' `python3 -c "import os,diskimage_builder;
 
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' `python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))"`/elements/debian-minimal/package-installs.yaml
 
-
-#DIB_QUIET=1 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
 ELEMENTS_PATH=$WORKDIR/elements \
+DIB_IMAGE_CACHE=/dev/shm \
 DIB_RELEASE=unstable \
 DIB_APT_MINIMAL_CREATE_INTERFACES=0 \
 DIB_DEBOOTSTRAP_EXTRA_ARGS+=" --no-check-gpg" \
@@ -95,18 +93,12 @@ DIB_DEV_USER_PASSWORD=debian \
 DIB_DEV_USER_SHELL=/bin/bash \
 DIB_DEV_USER_PWDLESS_SUDO=yes \
 DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
-disk-image-create -o $WORKDIR/sid.qcow2 vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
+disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"`.cmp.img vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
 
-echo "Original image size:"
-ls -lh $WORKDIR/sid.qcow2
-
-echo Converting ...
-qemu-img convert -f qcow2 -c -O qcow2 $WORKDIR/sid.qcow2 /dev/shm/sid-`date "+%Y%m%d"`.cmp.img
-
-echo "Compressed image size:"
 ls -lh /dev/shm/sid-*.cmp.img
 
-sync
-umount $WORKDIR
+ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
+curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
+chmod +x /tmp/ffsend
 
-exit 0
+/tmp/ffsend -Ifyq upload /dev/shm/sid-*.cmp.img
