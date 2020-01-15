@@ -75,6 +75,7 @@ sed -i -e '/lsb-release/{n;d}' -e '/lsb-release/d' "$PY_DIB_PATH"/elements/deboo
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
 #DIB_QUIET=1 \
+DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
