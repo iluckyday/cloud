@@ -20,7 +20,7 @@ sed -i '/src/d' $TARGET_ROOT/etc/apt/sources.list
 sudo chroot $TARGET_ROOT systemctl enable systemd-networkd
 sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer apt-daily-upgrade.timer fstrim.timer motd-news.timer
 
-#sudo chroot $TARGET_ROOT apt remove --purge -y 
+sudo chroot $TARGET_ROOT apt remove --purge -y python* 
 
 sudo rm -rf $TARGET_ROOT/etc/dib-manifests $TARGET_ROOT/var/log/* $TARGET_ROOT/usr/share/doc/* $TARGET_ROOT/usr/share/local/doc/* $TARGET_ROOT/usr/share/man/* $TARGET_ROOT/tmp/* $TARGET_ROOT/var/tmp/* $TARGET_ROOT/var/cache/apt/*
 sudo find $TARGET_ROOT/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
@@ -94,7 +94,6 @@ DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
 disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"` vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
 
 ls -lh /dev/shm/sid-*.qcow2
-exit 0
 
 ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
