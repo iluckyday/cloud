@@ -71,8 +71,6 @@ sed -i 's/4096/16384 -O ^has_journal/' "$PY_DIB_PATH"/lib/disk-image-create
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml
 sed -i 's/vga=normal/quiet ipv6.disable=1 intel_iommu=on/' "$PY_DIB_PATH"/elements/*/*/*-bootloader
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
-ls -l "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
-exit 0
 
 DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
