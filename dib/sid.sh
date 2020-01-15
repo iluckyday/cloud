@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 WORKDIR=/tmp/sid
 
@@ -74,7 +74,7 @@ sed -i -e '/gnupg/d' -e '/python/d' "$PY_DIB_PATH"/elements/debian-minimal/root.
 sed -i -e '/lsb-release/{n;d}' -e '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
-DIB_QUIET=1 \
+#DIB_QUIET=1 \
 DIB_IMAGE_SIZE=20 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
