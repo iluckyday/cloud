@@ -22,7 +22,7 @@ cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
 
 TBDIR=\$TMP_BUILD_DIR/mnt
 
-cp -R $WORKDIR/files/* \${TBDIR}
+cp -R $WORKDIR/files/* \$TBDIR
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
 for f in /etc/hostname /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
     rm -rf \$TBDIR\$f
@@ -111,8 +111,7 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
-DIB_QUIET=0 \
-DIB_DEBUG_TRACE=1 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
