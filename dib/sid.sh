@@ -19,7 +19,6 @@ chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
 
 cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
 #!/bin/bash
-set -x
 
 TBDIR=\$TMP_BUILD_DIR/mnt
 
@@ -35,7 +34,6 @@ chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-diy
 cat << 'EOF' > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
 #!/bin/bash
 
-cp $WORKDIR/files/etc/fstab $TARGET_ROOT/etc/fstab
 chroot $TARGET_ROOT apt remove --purge -y python* libpython*
 EOF
 chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
@@ -113,7 +111,7 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
-DIB_QUIET=0 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
