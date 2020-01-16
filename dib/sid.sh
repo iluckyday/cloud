@@ -3,7 +3,7 @@ set -e
 
 WORKDIR=/tmp/sid
 
-mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{post-install.d,post-root.d}
+mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{post-install.d,post-root.d,cleanup.d}
 
 cat << 'EOF' > $WORKDIR/elements/diy/post-install.d/99-zz-diy
 #!/bin/bash
@@ -14,7 +14,6 @@ echo -e "\nexport HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null"| sudo
 systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
 systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
-apt remove --purge -y python* libpython*
 EOF
 chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
 
@@ -31,6 +30,14 @@ done
 find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
 EOF
 chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-diy
+
+cat << 'EOF' > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+#!/bin/bash
+
+chroot $TARGET_ROOT apt remove --purge -y python* libpython*
+EOF
+chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+
 
 cat << EOF > $WORKDIR/files/etc/fstab
 LABEL=cloudimg-rootfs /         ext4  defaults,noatime                            0 0
@@ -101,7 +108,9 @@ sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/bootloader/c
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
 sed -i '/lsb-release/,/^/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 cat "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
-rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
+for i in cloud-init debian-networking baseline-environment baseline-tools ; do
+    rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
+done
 
 iDIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
