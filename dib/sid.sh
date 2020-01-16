@@ -108,7 +108,7 @@ sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/bootloader/c
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
 sed -i '/lsb-release/,/^/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 cat "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
-for i in cloud-init debian-networking baseline-environment baseline-tools write-dpkg-manifest ; do
+for i in cloud-init debian-networking baseline-environment baseline-tools write-dpkg-manifest copy-manifests-dir ; do
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
