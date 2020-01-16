@@ -5,27 +5,32 @@ WORKDIR=/tmp/sid
 
 mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{extra-data.d,cleanup.d}
 
-cat << "EOF" > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+cat << 'EOF' > $WORKDIR/elements/diy/post-install.d/99-zz-diy
 #!/bin/bash
-export TARGET_ROOT
-export basedir=$(dirname ${ELEMENTS_PATH%%:*})
-find ${basedir}/files -type f -exec bash -c 'dirname {} | sed -e "s@${basedir}/files@@" | xargs -I % bash -c "mkdir -p $TARGET_ROOT%; sudo cp {} $TARGET_ROOT%"' \;
 
-sudo touch $TARGET_ROOT/home/${DIB_DEV_USER_USERNAME}/.hushlogin
-echo -e "\n\nexport HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null"| sudo tee -a $TARGET_ROOT/home/${DIB_DEV_USER_USERNAME}/.bashrc
-echo -e "\n\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | sudo tee -a $TARGET_ROOT/etc/sysctl.conf
+sudo -u ${DIB_DEV_USER_USERNAME} sh -c "touch /home/${DIB_DEV_USER_USERNAME}/.hushlogin"
+echo -e "\nexport HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null"| sudo -u ${DIB_DEV_USER_USERNAME} tee -a /home/${DIB_DEV_USER_USERNAME}/.bashrc
 
-sudo chroot $TARGET_ROOT systemctl enable systemd-networkd
-sudo chroot $TARGET_ROOT systemctl disable e2scrub_reap.service
-sudo chroot $TARGET_ROOT systemctl -f mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
-
-sudo chroot $TARGET_ROOT chown debian:debian /home/debian/.hushlogin
-sudo chroot $TARGET_ROOT apt remove --purge -y python* libpython* 
-
-sudo rm -rf $TARGET_ROOT/etc/dib-manifests $TARGET_ROOT/var/log/* $TARGET_ROOT/usr/share/doc/* $TARGET_ROOT/usr/share/local/doc/* $TARGET_ROOT/usr/share/man/* $TARGET_ROOT/tmp/* $TARGET_ROOT/var/tmp/* $TARGET_ROOT/var/cache/apt/*
-sudo find $TARGET_ROOT/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
+systemctl enable systemd-networkd
+systemctl disable e2scrub_reap.service
+systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
+apt remove --purge -y python* libpython*
 EOF
-chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
+
+cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
+#!/bin/bash
+
+TBDIR=\$TMP_BUILD_DIR/mnt
+
+find $WORKDIR/files -type f -exec bash -c 'dirname {} | sed -e "s@$WORKDIR/files@@" | xargs -I % bash -c "mkdir -p \$TBDIR%; cp {} \$TBDIR%"' \;
+echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
+for f in /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
+    rm -rf \$TBDIR\$f
+done
+find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
+EOF
+chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-diy
 
 cat << EOF > $WORKDIR/files/etc/fstab
 LABEL=cloudimg-rootfs /         ext4  defaults,noatime                            0 0
@@ -83,6 +88,11 @@ cat << EOF > $WORKDIR/block.yaml
           type: ext4
           label: cloudimage-root
           opts: "-i 16384 -O ^has_journal"
+          mount:
+            mount_point: /
+            fstab:
+              options: "defaults,noatime"
+              fsck-passno: 0
 EOF
 
 PY_DIB_PATH=$(python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))")
