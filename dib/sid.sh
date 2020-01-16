@@ -25,7 +25,7 @@ TBDIR=\$TMP_BUILD_DIR/mnt
 
 cp -R $WORKDIR/files/* \${TBDIR}
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
-for f in /etc/hostname /etc/dib-manifests "/var/log/*" "/usr/share/doc/*" "/usr/share/local/doc/*" "/usr/share/man/*" "/tmp/*" "/var/tmp/*" "/var/cache/apt/*" ; do
+for f in /etc/hostname /etc/dib-manifests '/var/log/*' '/usr/share/doc/*' '/usr/share/local/doc/*' '/usr/share/man/*' '/tmp/*' '/var/tmp/*' '/var/cache/apt/*' ; do
     rm -rf \$TBDIR\$f
 done
 find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
