@@ -112,7 +112,7 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
-iDIB_DEBUG_TRACE=1 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
@@ -130,8 +130,6 @@ DIB_DEV_USER_SHELL=/bin/bash \
 DIB_DEV_USER_PWDLESS_SUDO=yes \
 DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
 disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"`.qcow2 vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
-
-exit 0
 
 ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
