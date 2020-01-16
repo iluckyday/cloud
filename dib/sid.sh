@@ -19,13 +19,12 @@ chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
 
 cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
 #!/bin/bash
-set -x
 
 TBDIR=\$TMP_BUILD_DIR/mnt
 
 cp -R $WORKDIR/files/* \${TBDIR}
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
-for f in /etc/hostname /etc/dib-manifests '/var/log/*' '/usr/share/doc/*' '/usr/share/local/doc/*' '/usr/share/man/*' '/tmp/*' '/var/tmp/*' '/var/cache/apt/*' ; do
+for f in /etc/hostname /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
     rm -rf \$TBDIR\$f
 done
 find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
@@ -113,6 +112,7 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
 done
 
 DIB_QUIET=0 \
+DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
@@ -123,7 +123,7 @@ DIB_PYTHON_VERSION=3 \
 DIB_RELEASE=unstable \
 DIB_DEBIAN_COMPONENTS=main,contrib,non-free \
 DIB_APT_MINIMAL_CREATE_INTERFACES=0 \
-DIB_DEBOOTSTRAP_EXTRA_ARGS+=" --no-check-gpg" \
+DIB_DEBOOTSTRAP_EXTRA_ARGS+="--no-check-gpg" \
 DIB_DEV_USER_USERNAME=debian \
 DIB_DEV_USER_PASSWORD=debian \
 DIB_DEV_USER_SHELL=/bin/bash \
