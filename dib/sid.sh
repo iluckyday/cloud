@@ -3,7 +3,7 @@ set -e
 
 WORKDIR=/tmp/sid
 
-mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{extra-data.d,cleanup.d}
+mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{post-install.d,post-root.d}
 
 cat << 'EOF' > $WORKDIR/elements/diy/post-install.d/99-zz-diy
 #!/bin/bash
