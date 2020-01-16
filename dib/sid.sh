@@ -23,7 +23,7 @@ set -x
 
 TBDIR=\$TMP_BUILD_DIR/mnt
 
-find $WORKDIR/files -type f -exec bash -c 'dirname {} | sed -e "s@$WORKDIR/files@@" | xargs -I % bash -c "mkdir -p $TBDIR%; cp {} $TBDIR%"' \;
+cp -R $WORKDIR/files/* \${TBDIR}
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
 for f in /etc/hostname /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
     rm -rf \$TBDIR\$f
