@@ -19,12 +19,13 @@ chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
 
 cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
 #!/bin/bash
+set -x
 
 TBDIR=\$TMP_BUILD_DIR/mnt
 
 find $WORKDIR/files -type f -exec bash -c 'dirname {} | sed -e "s@$WORKDIR/files@@" | xargs -I % bash -c "mkdir -p \$TBDIR%; cp {} \$TBDIR%"' \;
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TBDIR/etc/sysctl.conf
-for f in /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
+for f in /etc/hostname /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share/local/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/* ; do
     rm -rf \$TBDIR\$f
 done
 find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
@@ -34,6 +35,7 @@ chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-diy
 cat << 'EOF' > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
 #!/bin/bash
 
+cp $WORKDIR/files/etc/fstab $TARGET_ROOT/etc/fstab
 chroot $TARGET_ROOT apt remove --purge -y python* libpython*
 EOF
 chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
@@ -107,7 +109,6 @@ sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/de
 sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/bootloader/cleanup.d/51-bootloader
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
 sed -i '/lsb-release/,/^/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
-cat "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 for i in cloud-init debian-networking baseline-environment baseline-tools write-dpkg-manifest copy-manifests-dir ; do
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
@@ -135,4 +136,5 @@ ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/la
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
 chmod +x /tmp/ffsend
 
+ls -lh /dev/shm/sid-*.qcow2
 /tmp/ffsend -Ifyq upload /dev/shm/sid-*.qcow2
