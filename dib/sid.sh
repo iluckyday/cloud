@@ -89,12 +89,11 @@ PY_DIB_PATH=$(python3 -c "import os,diskimage_builder; print(os.path.dirname(dis
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml
 sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/bootloader/cleanup.d/51-bootloader
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
-sed -i '/lsb-release/{n;d}' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
-sed -i '/lsb-release/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
+sed -i '/lsb-release/,/^/d' "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 cat "$PY_DIB_PATH"/elements/debootstrap/package-installs.yaml
 rm -rf "$PY_DIB_PATH"/elements/{*/*/*-cloud-init,*/*/*-debian-networking,*/*/*-baseline-environment,*/*/*-baseline-tools}
 
-DIB_QUIET=1 \
+iDIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
