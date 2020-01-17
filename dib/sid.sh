@@ -70,31 +70,8 @@ Name=en*
 DHCP=ipv4
 EOF
 
-cat << EOF > $WORKDIR/block.yaml
-- local_loop:
-    name: image0
-
-- partitioning:
-    base: image0
-    label: mbr
-    partitions:
-      - name: root
-        flags: [ boot, primary ]
-        size: 100%
-        mkfs:
-          name: mkfs_root
-          base: root
-          type: ext4
-          label: cloudimage-root
-          opts: "-i 16384 -O ^has_journal"
-          mount:
-            mount_point: /
-            fstab:
-              options: "defaults,noatime"
-              fsck-passno: 0
-EOF
-
 PY_DIB_PATH=$(python3 -c "import os,diskimage_builder; print(os.path.dirname(diskimage_builder.__file__))")
+sed -i 's/-i 4096/-i 16384 -O ^has_journal/' "$PY_DIB_PATH"/lib/disk-image-create
 sed -i 's/linux-image-amd64/linux-image-cloud-amd64/' "$PY_DIB_PATH"/elements/debian-minimal/package-installs.yaml
 sed -i 's/vga=normal/quiet ipv6.disable=1/' "$PY_DIB_PATH"/elements/bootloader/cleanup.d/51-bootloader
 sed -i -e '/gnupg/d' "$PY_DIB_PATH"/elements/debian-minimal/root.d/75-debian-minimal-baseinstall
@@ -106,7 +83,6 @@ done
 DIB_QUIET=0 \
 DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
-DIB_BLOCK_DEVICE_CONFIG=file://$WORKDIR/block.yaml \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
 ELEMENTS_PATH=$WORKDIR/elements \
