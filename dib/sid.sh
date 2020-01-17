@@ -7,6 +7,7 @@ mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg
 
 cat << EOF > $WORKDIR/elements/diy/cleanup.d/99-zz-diy-config
 #!/bin/bash
+set -x
 
 cp -R $WORKDIR/files/* \$TARGET_ROOT
 echo -e "\nnet.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr" | tee -a \$TARGET_ROOT/etc/sysctl.conf
@@ -86,7 +87,8 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
-DIB_QUIET=1 \
+DIB_QUIET=0 \
+DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
@@ -103,6 +105,7 @@ DIB_DEV_USER_SHELL=/bin/bash \
 DIB_DEV_USER_PWDLESS_SUDO=yes \
 DIB_DEBOOTSTRAP_DEFAULT_LOCALE=en_US.UTF-8 \
 disk-image-create -o /dev/shm/sid-`date "+%Y%m%d"`.qcow2 vm block-device-mbr cleanup-kernel-initrd devuser diy debian-minimal
+exit
 
 ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
