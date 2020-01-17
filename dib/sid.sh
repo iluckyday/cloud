@@ -25,6 +25,9 @@ systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
 systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
 
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+find /usr/share/zoneinfo -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} \;
+
 apt remove --purge -y python* libpython*
 "
 EOF
@@ -81,7 +84,6 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
 done
 
 DIB_QUIET=0 \
-DIB_DEBUG_TRACE=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
