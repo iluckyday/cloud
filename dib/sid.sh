@@ -5,7 +5,7 @@ WORKDIR=/tmp/sid
 
 mkdir -p $WORKDIR/files $WORKDIR/files/home/debian $WORKDIR/files/etc/{dpkg/dpkg.cfg.d,apt/apt.conf.d} $WORKDIR/files/etc/systemd/{system,network,journald.conf.d} $WORKDIR/elements/diy/{post-install.d,post-root.d,cleanup.d}
 
-cat << 'EOF' > $WORKDIR/elements/diy/post-install.d/99-zz-diy
+cat << 'EOF' > $WORKDIR/elements/diy/post-install.d/99-zz-config
 #!/bin/bash
 
 sudo -u ${DIB_DEV_USER_USERNAME} sh -c "touch /home/${DIB_DEV_USER_USERNAME}/.hushlogin"
@@ -15,9 +15,9 @@ systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
 systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
 EOF
-chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-diy
+chmod +x $WORKDIR/elements/diy/post-install.d/99-zz-config
 
-cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-diy
+cat << EOF > $WORKDIR/elements/diy/post-root.d/99-zz-delete-files
 #!/bin/bash
 
 TBDIR=\$TMP_BUILD_DIR/mnt
@@ -29,14 +29,14 @@ for f in /etc/hostname /etc/dib-manifests /var/log/* /usr/share/doc/* /usr/share
 done
 find \$TBDIR/usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
 EOF
-chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-diy
+chmod +x $WORKDIR/elements/diy/post-root.d/99-zz-delete-files
 
-cat << 'EOF' > $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+cat << 'EOF' > $WORKDIR/elements/diy/cleanup.d/99-zz-remove-packages
 #!/bin/bash
 
 chroot $TARGET_ROOT apt remove --purge -y python* libpython*
 EOF
-chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy
+chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-remove-packages
 
 
 cat << EOF > $WORKDIR/files/etc/fstab
