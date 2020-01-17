@@ -21,14 +21,14 @@ echo 'export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null'| tee -a /h
 "
 
 chroot \$TARGET_ROOT /bin/bash -c "
-echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf
+echo -e \"nameserver 8.8.8.8\nnameserver 8.8.4.4\" > /etc/resolv.conf
 
 systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
 systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
 
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-find /usr/share/zoneinfo -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} \;
+find /usr/share/zoneinfo -prune -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} \;
 
 apt remove --purge -y python* libpython*
 "
