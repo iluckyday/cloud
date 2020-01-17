@@ -21,6 +21,8 @@ echo 'export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null'| tee -a /h
 "
 
 chroot \$TARGET_ROOT /bin/bash -c "
+echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf
+
 systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
 systemctl mask apt-daily.timer e2scrub_reap.service apt-daily-upgrade.timer e2scrub_all.timer fstrim.timer motd-news.timer
@@ -83,7 +85,7 @@ for i in cloud-init debian-networking baseline-environment baseline-tools write-
     rm -rf "$PY_DIB_PATH"/elements/*/*/*$i
 done
 
-DIB_QUIET=0 \
+DIB_QUIET=1 \
 DIB_IMAGE_SIZE=10 \
 DIB_JOURNAL_SIZE=0 \
 DIB_EXTLINUX=1 \
