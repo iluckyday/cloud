@@ -21,7 +21,8 @@ echo 'export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null'| tee -a /h
 "
 
 chroot \$TARGET_ROOT /bin/bash -c "
-echo -e \"nameserver 8.8.8.8\nnameserver 8.8.4.4\" > /etc/resolv.conf
+echo nameserver 8.8.8.8 > /etc/resolv.conf
+echo nameserver 8.8.4.4 >> /etc/resolv.conf
 
 systemctl enable systemd-networkd
 systemctl disable e2scrub_reap.service
