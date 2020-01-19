@@ -7,6 +7,7 @@ DEBIAN_FRONTEND=noninteractive apt update
 DEBIAN_FRONTEND=noninteractive apt install -qq debootstrap qemu-utils
 
 imagedir=/mnt/sid
+include="locales,systemd-sysv"
 device=$(losetup -f)
 
 dd if=/dev/zero of=/dev/shm/sid.raw bs=1 count=0 seek=10G
@@ -17,7 +18,7 @@ tune2fs -i 0 $device
 mkdir -p $imagedir
 mount $device $imagedir
 
-/usr/sbin/debootstrap --no-check-gpg --components=main,contrib,non-free --variant=minbase sid /mnt/sid http://deb.debian.org/debian
+/usr/sbin/debootstrap --no-check-gpg --components=main,contrib,non-free --variant=minbase --include="$include" sid /mnt/sid http://deb.debian.org/debian
 
 mount --bind /dev $imagedir/dev
 chroot $imagedir mount -t proc none /proc
@@ -89,8 +90,8 @@ dpkg-reconfigure --priority=critical locales
 
 mkdir /tmp/apt
 DEBIAN_FRONTEND=noninteractive apt -o Dir::Cache=/tmp/apt -o Dir::State::lists=/tmp/apt update
-DEBIAN_FRONTEND=noninteractive apt -o Dir::Cache=/tmp/apt -o Dir::State::lists=/tmp/apt install -y -qq linux-image-cloud-amd64 extlinux
-dd bs=440 count=1 conv=notrunc if=/usr/share/syslinux/mbr.bin of=$device
+DEBIAN_FRONTEND=noninteractive apt -o Dir::Cache=/tmp/apt -o Dir::State::lists=/tmp/apt install -y -qq linux-image-cloud-amd64 extlinux syslinux-common
+dd bs=440 count=1 conv=notrunc if=/usr/lib/extlinux/mbr.bin of=$device
 extlinux -i /boot
 
 systemctl enable systemd-networkd
