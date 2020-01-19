@@ -1,0 +1,15 @@
+name: create sid cloud image
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: fast sources.list
+        run: sudo sed -i '/src/d' /etc/apt/sources.list && sudo rm -rf /etc/apt/sources.list.d
+
+      - name: Build
+        run: sudo /bin/bash create-sid-image.sh
