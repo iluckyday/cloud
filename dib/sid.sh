@@ -31,6 +31,7 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 find /usr/share/zoneinfo -prune -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} \;
 
 apt remove --purge -y python* libpython*
+apt autoremove -y
 "
 EOF
 chmod +x $WORKDIR/elements/diy/cleanup.d/99-zz-diy-config
