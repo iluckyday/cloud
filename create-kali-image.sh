@@ -40,10 +40,6 @@ tmpfs             /tmp     tmpfs mode=1777,strictatime,nosuid,nodev,size=90% 0 0
 tmpfs             /var/log tmpfs defaults,noatime                            0 0
 EOF
 
-cat << EOF >> $imagedir/etc/modprobe.d/blacklist.conf
-blacklist pcspkr
-EOF
-
 mkdir -p $imagedir/etc/apt/apt.conf.d
 cat << EOF > $imagedir/etc/apt/apt.conf.d/99-freedisk
 APT::Authentication "0";
