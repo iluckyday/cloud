@@ -107,7 +107,7 @@ if [ -f $imagedir/root/.bash_history ]; then
 fi
 
 
-umount $imagedir/dev/pts $imagedir/dev $imagedir/proc $imagedir/sys/fs/fuse/connections $imagedir/sys
+umount $imagedir/dev/pts $imagedir/dev $imagedir/proc $imagedir/sys
 sleep 1
 
 while [ -n "`lsof $imagedir`" ]; do
