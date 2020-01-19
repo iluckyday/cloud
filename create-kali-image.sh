@@ -16,7 +16,7 @@ mkfs.ext4 -F -L kali-root -b 1024 -I 128 -O "^has_journal" $device
 tune2fs -i 0 $device
 
 mkdir -p $imagedir
-mount $dev $imagedir
+mount $device $imagedir
 
 /usr/sbin/debootstrap --no-check-gpg --components=main,contrib,non-free --variant=minbase kali-rolling /mnt/kali http://http.kali.org/kali
 
