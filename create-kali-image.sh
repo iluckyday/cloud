@@ -19,7 +19,7 @@ mkdir -p $imagedir
 mount $device $imagedir
 
 keyring_pkg=$(curl -skL https://http.kali.org/pool/main/k/kali-archive-keyring | awk -F'"' '/all.deb/ {print $8}' | tail -n 1)
-dpkg -i https://http.kali.org/pool/main/k/kali-archive-keyring/${keyring_pkg}
+curl -skL https://http.kali.org/pool/main/k/kali-archive-keyring/${keyring_pkg} | dpkg --install -
 (echo "default_mirror http://http.kali.org/kali"; sed -e "s/debian-archive-keyring.gpg/kali-archive-keyring.gpg/g" sid) > /usr/share/debootstrap/scripts/kali
 (cd /usr/share/debootstrap/scripts; ln -s kali kali-rolling)
 
