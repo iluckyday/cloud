@@ -31,7 +31,7 @@ chroot $imagedir mount -t sysfs none /sys
 chroot $imagedir mount -t devpts none /dev/pts
 
 echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > $imagedir/etc/resolv.conf
-echo tcp_bbr >> $imagedir/etc/modules
+#echo tcp_bbr >> $imagedir/etc/modules
 sed -i '/src/d' $imagedir/etc/apt/sources.list
 
 cat << EOF > $imagedir/etc/fstab
@@ -72,7 +72,8 @@ cat << EOF >> $imagedir/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
 
-cat << EOF > $imagedir/etc/sysctl.d/10-tcp_bbr.conf
+mkdir -p $imagedir/etc/sysctl.d
+cat << EOF >> $imagedir/etc/sysctl.d/10-tcp_bbr.conf
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOF
