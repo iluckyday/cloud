@@ -1,42 +1,47 @@
-#!/bin/bash
-#
-
+#!/bin/sh
 set -e
 
-DEBIAN_FRONTEND=noninteractive apt update
-DEBIAN_FRONTEND=noninteractive apt install -qq debootstrap qemu-utils
+sid_apps="bash-completion,openssh-server"
 
-imagedir=/mnt/sid
-include="locales,systemd-sysv"
-device=$(losetup -f)
+exclude_apps="unattended-upgrades"
+enable_services="ssh.service"
+disable_services="apt-daily.timer apt-daily-upgrade.timer"
 
-dd if=/dev/zero of=/dev/shm/sid.raw bs=1 count=0 seek=10G
-losetup $device /dev/shm/sid.raw
-mkfs.ext4 -F -L debian-root -b 1024 -I 128 -O "^has_journal" $device
-tune2fs -i 0 $device
+echo Go ...
+export DEBIAN_FRONTEND=noninteractive
+apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
+apt update
+apt install -y debootstrap qemu-utils
 
-mkdir -p $imagedir
-mount $device $imagedir
+mount_dir=/tmp/debian
 
-/usr/sbin/debootstrap --no-check-gpg --components=main,contrib,non-free --variant=minbase --include="$include" sid /mnt/sid http://deb.debian.org/debian
+qemu-img create -f raw /tmp/sid.raw 201G
+loopx=$(losetup --show -f -P /tmp/sid.raw)
 
-mount --bind /dev $imagedir/dev
-chroot $imagedir mount -t proc none /proc
-chroot $imagedir mount -t sysfs none /sys
-chroot $imagedir mount -t devpts none /dev/pts
+mkfs.ext4 -F -L debian-root -b 1024 -I 128 -O "^has_journal" $loopx
 
-echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > $imagedir/etc/resolv.conf
-#echo tcp_bbr >> $imagedir/etc/modules
-sed -i '/src/d' $imagedir/etc/apt/sources.list
+mkdir -p ${mount_dir}
+mount $loopx ${mount_dir}
 
-cat << EOF > $imagedir/etc/fstab
-LABEL=debian-root /        ext4  defaults,noatime                            0 0
-tmpfs             /tmp     tmpfs mode=1777,strictatime,nosuid,nodev,size=90% 0 0
-tmpfs             /var/log tmpfs defaults,noatime                            0 0
+sed -i 's/ls -A/ls --ignore=lost+found -A/' /usr/sbin/debootstrap
+/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --cache-dir=/tmp --components=main,contrib,non-free --include="$sid_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
+
+mount -t proc none ${mount_dir}/proc
+mount -o bind /sys ${mount_dir}/sys
+mount -o bind /dev ${mount_dir}/dev
+
+cat << EOF > ${mount_dir}/etc/fstab
+LABEL=debian-root /        ext4  defaults,noatime                0 0
+tmpfs             /tmp     tmpfs mode=1777,size=90%              0 0
+tmpfs             /var/log tmpfs defaults,noatime                0 0
 EOF
 
-mkdir -p $imagedir/etc/apt/apt.conf.d
-cat << EOF > $imagedir/etc/apt/apt.conf.d/99-freedisk
+mkdir -p ${mount_dir}/root/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys
+chmod 600 ${mount_dir}/root/.ssh/authorized_keys
+
+mkdir -p ${mount_dir}/etc/apt/apt.conf.d
+cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99-freedisk
 APT::Authentication "0";
 APT::Get::AllowUnauthenticated "1";
 Dir::Cache "/dev/shm";
@@ -45,8 +50,13 @@ Dir::Log "/dev/shm";
 DPkg::Post-Invoke {"/bin/rm -f /dev/shm/archives/*.deb || true";};
 EOF
 
-mkdir -p $imagedir/etc/dpkg/dpkg.cfg.d
-cat << EOF > $imagedir/etc/dpkg/dpkg.cfg.d/99-nodoc
+cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99norecommend
+APT::Install-Recommends "0";
+APT::Install-Suggests "0";
+EOF
+
+mkdir -p ${mount_dir}/etc/dpkg/dpkg.cfg.d
+cat << EOF > ${mount_dir}/etc/dpkg/dpkg.cfg.d/99-nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
@@ -57,66 +67,69 @@ path-exclude /usr/share/locale/*
 path-include /usr/share/locale/en*
 EOF
 
-mkdir -p $imagedir/etc/systemd/journald.conf.d
-cat << EOF > $imagedir/etc/systemd/journald.conf.d/storage.conf
+mkdir -p ${mount_dir}/etc/systemd/journald.conf.d
+cat << EOF > ${mount_dir}/etc/systemd/journald.conf.d/storage.conf
 [Journal]
 Storage=volatile
 EOF
 
-cat << EOF >> $imagedir/root/.bashrc
+mkdir -p ${mount_dir}/etc/systemd/system-environment-generators
+cat << EOF > ${mount_dir}/etc/systemd/system-environment-generators/20-python
+#!/bin/sh
+echo 'PYTHONDONTWRITEBYTECODE=1'
+echo 'PYTHONHISTFILE=/dev/null'
+EOF
+chmod +x ${mount_dir}/etc/systemd/system-environment-generators/20-python
+
+cat << EOF > ${mount_dir}/etc/profile.d/python.sh
+#!/bin/sh
+export PYTHONDONTWRITEBYTECODE=1 PYTHONHISTFILE=/dev/null
+EOF
+
+cat << EOF > ${mount_dir}/etc/pip.conf
+[global]
+download-cache=/tmp
+cache-dir=/tmp
+EOF
+
+cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
 
-mkdir -p $imagedir/etc/sysctl.d
-cat << EOF >> $imagedir/etc/sysctl.d/10-tcp_bbr.conf
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
+mkdir -p ${mount_dir}/boot/syslinux
+cat << EOF > ${mount_dir}/boot/syslinux/syslinux.cfg
+PROMPT 0
+TIMEOUT 0
+DEFAULT debian
+
+LABEL debian
+        LINUX /boot/vmlinuz
+        INITRD /boot/initrd.img
+        APPEND root=LABEL=debian-root quiet
 EOF
 
-cat << EOF > $imagedir/etc/sysctl.d/20-security.conf
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_synack_retries = 5
-net.ipv4.tcp_syncookies = 1
-net.ipv4.icmp_ignore_bogus_error_responses=1
-net.ipv4.icmp_echo_ignore_all = 1
-EOF
+chroot ${mount_dir} /bin/bash -c "
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin PYTHONDONTWRITEBYTECODE=1 DEBIAN_FRONTEND=noninteractive
+sed -i 's/root:\*:/root::/' etc/shadow
+apt update
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
+dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
+extlinux -i /boot/syslinux
 
-chroot $imagedir /bin/bash -c "
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin
-echo root:debian | chpasswd
-ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen
-dpkg-reconfigure --priority=critical locales
+systemctl enable $enable_services
+systemctl disable $disable_services
 
-mkdir /tmp/apt
-DEBIAN_FRONTEND=noninteractive apt -o Dir::Cache=/tmp/apt -o Dir::State::lists=/tmp/apt update
-DEBIAN_FRONTEND=noninteractive apt -o Dir::Cache=/tmp/apt -o Dir::State::lists=/tmp/apt install -y -qq linux-image-cloud-amd64 extlinux syslinux-common
-dd bs=440 count=1 conv=notrunc if=/usr/lib/extlinux/mbr.bin of=$device
-extlinux -i /boot
-
-systemctl enable systemd-networkd
-systemctl -f mask apt-daily.timer apt-daily-upgrade.timer fstrim.timer motd-news.timer
-
-rm -rf /etc/hostname /tmp/apt /var/log/* /usr/share/doc/* /usr/local/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /var/cache/apt/*
-find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en' -exec rm -rf {} +
+sed -i '/src/d' /etc/apt/sources.list
+rm -rf /etc/hostname /etc/resolv.conf /usr/share/doc /usr/share/man /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
+find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 find /usr/share/zoneinfo -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} +
 "
 
-if [ -f $imagedir/root/.bash_history ]; then
-	shred --remove $imagedir/root/.bash_history
-fi
-
-
-umount $imagedir/dev/pts $imagedir/dev $imagedir/proc $imagedir/sys
+sync ${mount_dir}
+umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
 sleep 1
+umount ${mount_dir}
+sleep 1
+losetup -d $loopx
 
-while [ -n "`lsof $imagedir`" ]; do
-	sleep 1
-done
-
-umount $imagedir
-losetup -d $device
-sync
-qemu-img convert -c -f raw -O qcow2 /dev/shm/sid.raw /dev/shm/sid.qcow2
-
-ls -lh /dev/shm/sid.qcow2
+qemu-img convert -c -f raw -O qcow2 /tmp/sid.raw /tmp/sid.img

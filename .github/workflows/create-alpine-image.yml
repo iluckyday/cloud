@@ -1,4 +1,4 @@
-name: create sid cloud image
+name: create alpine image
 
 on: push
 
@@ -21,4 +21,4 @@ jobs:
           chmod +x /tmp/ffsend
 
       - name: Push to Firefox Send
-        run: /tmp/ffsend -Ifyq upload /tmp/sid.img
+        run: /tmp/ffsend -Ifyq upload /tmp/alpine.img
