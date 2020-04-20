@@ -12,7 +12,7 @@ jobs:
         run: sudo sed -i '/src/d' /etc/apt/sources.list && sudo rm -rf /etc/apt/sources.list.d
 
       - name: Build
-        run: sudo /bin/bash create-sid-image.sh
+        run: sudo /bin/bash create-alpine-image.sh
 
       - name: Install ffsend
         run: |

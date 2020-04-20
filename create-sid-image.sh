@@ -24,7 +24,7 @@ mkdir -p ${mount_dir}
 mount $loopx ${mount_dir}
 
 sed -i 's/ls -A/ls --ignore=lost+found -A/' /usr/sbin/debootstrap
-/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --cache-dir=/tmp --components=main,contrib,non-free --include="$sid_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
+/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$sid_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
 
 mount -t proc none ${mount_dir}/proc
 mount -o bind /sys ${mount_dir}/sys
