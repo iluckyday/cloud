@@ -21,6 +21,9 @@ jobs:
           chmod +x /tmp/ffsend
 
       - name: Push to Firefox Send
+        env:
+          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
+          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
         run: |
           FFSEND_URL="$(/tmp/ffsend -Ifyq upload /tmp/alpine.img)"
           FFSEND_URL=${FFSEND_URL/\#/%23}
