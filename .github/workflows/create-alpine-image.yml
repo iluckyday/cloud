@@ -30,7 +30,8 @@ jobs:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
         run: |
+          SIZE="$(du -h /tmp/alpine.img | awk '{print $1}')"
           FFSEND_URL="$(/tmp/ffsend -Ifyq upload /tmp/alpine.img)"
           FFSEND_URL=${FFSEND_URL/\#/%23}
-          data="alpine.img-""$FFSEND_URL"
+          data="alpine.img-$SIZE-$FFSEND_URL"
           curl -skL -o /dev/null "http://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
