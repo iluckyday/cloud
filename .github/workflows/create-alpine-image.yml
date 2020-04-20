@@ -21,4 +21,8 @@ jobs:
           chmod +x /tmp/ffsend
 
       - name: Push to Firefox Send
-        run: /tmp/ffsend -Ifyq upload /tmp/alpine.img
+        run: |
+          FFSEND_URL="$(/tmp/ffsend -Ifyq upload /tmp/alpine.img)"
+          FFSEND_URL=${FFSEND_URL/\#/%23}
+          data="alpine.img-""$FFSEND_URL"
+          curl -skL -o /dev/null "http://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"

@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/sh
 
 apt update
 apt install -y qemu-utils
 
-qemu-img create -f raw /tmp/alpine.raw 2G
+qemu-img create -f raw /tmp/alpine.raw 20G
 dev=$(losetup --show -f /tmp/alpine.raw)
 mkfs.ext4 -F -L alpine-root -b 1024 -I 128 -O "^has_journal" $dev
 

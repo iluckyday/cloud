@@ -1,13 +1,11 @@
 #!/bin/sh
 set -e
 
-sid_apps="bash-completion,openssh-server"
-
+sid_apps="systemd,systemd-sysv,bash-completion,openssh-server"
 exclude_apps="unattended-upgrades"
 enable_services="ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer"
 
-echo Go ...
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
 apt update
