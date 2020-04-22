@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-sid_apps="systemd,systemd-sysv,bash-completion,openssh-server"
-exclude_apps="tzdata,unattended-upgrades"
+include_apps="systemd,systemd-sysv,bash-completion,openssh-server"
+exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
@@ -22,7 +22,7 @@ mkdir -p ${mount_dir}
 mount $loopx ${mount_dir}
 
 sed -i 's/ls -A/ls --ignore=lost+found -A/' /usr/sbin/debootstrap
-/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$sid_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
+/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
 
 mount -t proc none ${mount_dir}/proc
 mount -o bind /sys ${mount_dir}/sys
@@ -105,9 +105,10 @@ extlinux -i /boot/syslinux
 
 systemctl enable $enable_services
 systemctl disable $disable_services
+apt remove -y --purge tzdata
 
 sed -i '/src/d' /etc/apt/sources.list
-rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
+rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
 find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 "
 
