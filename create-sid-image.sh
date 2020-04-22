@@ -7,7 +7,7 @@ enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
-apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
+#apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
 apt update
 apt install -y debootstrap qemu-utils
 
@@ -49,7 +49,7 @@ DPkg::Post-Invoke {"/bin/rm -f /dev/shm/archives/*.deb || true";};
 EOF
 
 cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99norecommend
-APT::Install-Recommends "0";
+APT::Install-Recommends "1";
 APT::Install-Suggests "0";
 EOF
 
