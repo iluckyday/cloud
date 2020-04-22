@@ -3,8 +3,8 @@ set -e
 
 sid_apps="systemd,systemd-sysv,bash-completion,openssh-server"
 exclude_apps="tzdata,unattended-upgrades"
-enable_services="ssh.service"
-disable_services="apt-daily.timer apt-daily-upgrade.timer"
+enable_services="systemd-networkd.service ssh.service"
+disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -71,23 +71,12 @@ cat << EOF > ${mount_dir}/etc/systemd/journald.conf.d/storage.conf
 Storage=volatile
 EOF
 
-mkdir -p ${mount_dir}/etc/systemd/system-environment-generators
-cat << EOF > ${mount_dir}/etc/systemd/system-environment-generators/20-python
-#!/bin/sh
-echo 'PYTHONDONTWRITEBYTECODE=1'
-echo 'PYTHONHISTFILE=/dev/null'
-EOF
-chmod +x ${mount_dir}/etc/systemd/system-environment-generators/20-python
+cat << EOF > ${mount_dir}/etc/systemd/network/20-dhcp.network
+[Match]
+Name=en*
 
-cat << EOF > ${mount_dir}/etc/profile.d/python.sh
-#!/bin/sh
-export PYTHONDONTWRITEBYTECODE=1 PYTHONHISTFILE=/dev/null
-EOF
-
-cat << EOF > ${mount_dir}/etc/pip.conf
-[global]
-download-cache=/tmp
-cache-dir=/tmp
+[Network]
+DHCP=ipv4
 EOF
 
 cat << EOF > ${mount_dir}/root/.bashrc
