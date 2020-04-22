@@ -79,11 +79,6 @@ Name=en*
 DHCP=ipv4
 EOF
 
-mkdir -p ${mount_dir}/etc/initramfs-tools/conf.d
-cat << EOF > ${mount_dir}/etc/initramfs-tools/conf.d/compress
-COMPRESS=xz
-EOF
-
 cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
