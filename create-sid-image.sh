@@ -7,7 +7,7 @@ enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
-#apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
+apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
 apt update
 apt install -y debootstrap qemu-utils
 
@@ -22,7 +22,8 @@ mkdir -p ${mount_dir}
 mount $loopx ${mount_dir}
 
 sed -i 's/ls -A/ls --ignore=lost+found -A/' /usr/sbin/debootstrap
-/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
+#/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
+/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" sid ${mount_dir}
 
 mount -t proc none ${mount_dir}/proc
 mount -o bind /sys ${mount_dir}/sys
@@ -49,7 +50,7 @@ DPkg::Post-Invoke {"/bin/rm -f /dev/shm/archives/*.deb || true";};
 EOF
 
 cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99norecommend
-APT::Install-Recommends "1";
+APT::Install-Recommends "0";
 APT::Install-Suggests "0";
 EOF
 
