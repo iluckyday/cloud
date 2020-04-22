@@ -2,7 +2,7 @@
 set -e
 
 sid_apps="systemd,systemd-sysv,bash-completion,openssh-server"
-exclude_apps="unattended-upgrades"
+exclude_apps="tzdata,unattended-upgrades"
 enable_services="ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer"
 
@@ -118,9 +118,8 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 
 sed -i '/src/d' /etc/apt/sources.list
-rm -rf /etc/hostname /etc/resolv.conf /usr/share/doc /usr/share/man /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
+rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
 find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
-find /usr/share/zoneinfo -mindepth 1 -maxdepth 2 ! -name 'UTC' -a ! -name 'UCT' -a ! -name 'PRC' -a ! -name 'Asia' -a ! -name '*Shanghai' -exec rm -rf {} +
 "
 
 sync ${mount_dir}
