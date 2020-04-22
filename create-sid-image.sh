@@ -3,7 +3,7 @@ set -e
 
 include_apps="systemd,systemd-sysv,bash-completion,openssh-server"
 exclude_apps="unattended-upgrades"
-enable_services="systemd-networkd.service systemd-resolved.service ssh.service"
+enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
@@ -111,6 +111,8 @@ sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
 find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 "
+
+echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
 
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
