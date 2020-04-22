@@ -22,8 +22,7 @@ mkdir -p ${mount_dir}
 mount $loopx ${mount_dir}
 
 sed -i 's/ls -A/ls --ignore=lost+found -A/' /usr/sbin/debootstrap
-#/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
-/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" sid ${mount_dir}
+/usr/sbin/debootstrap --no-check-gpg --no-check-certificate --components=main,contrib,non-free --include="$include_apps" --exclude="$exclude_apps" --variant minbase sid ${mount_dir}
 
 mount -t proc none ${mount_dir}/proc
 mount -o bind /sys ${mount_dir}/sys
@@ -106,7 +105,7 @@ extlinux -i /boot/syslinux
 busybox --install -s /bin
 
 systemctl enable $enable_services
-systemctl disable $disable_services
+#systemctl disable $disable_services
 apt remove -y --purge tzdata
 
 sed -i '/src/d' /etc/apt/sources.list
