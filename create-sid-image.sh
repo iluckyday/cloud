@@ -102,11 +102,11 @@ apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools busybox
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
+busybox --install -s /bin
 
 systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
-#busybox --install -s /usr/local/bin
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
