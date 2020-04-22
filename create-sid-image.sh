@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-include_apps="systemd,systemd-sysv,bash-completion,openssh-server"
+include_apps="systemd,systemd-sysv,bash-completion,openssh-server,ca-certificates"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
@@ -79,6 +79,11 @@ Name=en*
 DHCP=ipv4
 EOF
 
+mkdir -p ${mount_dir}/etc/initramfs-tools/conf.d
+cat << EOF > ${mount_dir}/etc/initramfs-tools/conf.d/compress
+COMPRESS=xz
+EOF
+
 cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
@@ -96,7 +101,7 @@ LABEL debian
 EOF
 
 chroot ${mount_dir} /bin/bash -c "
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin PYTHONDONTWRITEBYTECODE=1 DEBIAN_FRONTEND=noninteractive
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools busybox
