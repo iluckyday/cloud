@@ -106,6 +106,7 @@ extlinux -i /boot/syslinux
 systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
+#busybox --install -s /usr/local/bin
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*
