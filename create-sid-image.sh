@@ -101,8 +101,8 @@ TIMEOUT 0
 DEFAULT debian
 
 LABEL debian
-        LINUX /boot/vmlinuz
-        INITRD /boot/initrd.img
+        LINUX /vmlinuz
+        INITRD /initrd.img
         APPEND root=LABEL=debian-root quiet
 EOF
 
