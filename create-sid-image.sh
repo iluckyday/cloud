@@ -30,6 +30,7 @@ mount -o bind /dev ${mount_dir}/dev
 
 cat << EOF > ${mount_dir}/etc/fstab
 LABEL=debian-root /        ext4  defaults,noatime                0 0
+tmpfs             /run     tmpfs defaults,size=50%               0 0
 tmpfs             /tmp     tmpfs mode=1777,size=90%              0 0
 tmpfs             /var/log tmpfs defaults,noatime                0 0
 EOF
@@ -76,7 +77,8 @@ cat << EOF > ${mount_dir}/etc/systemd/network/20-dhcp.network
 Name=en*
 
 [Network]
-DHCP=ipv4
+DHCP=yes
+IPv6AcceptRA=yes
 EOF
 
 cat << EOF > ${mount_dir}/root/.bashrc
