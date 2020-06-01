@@ -34,4 +34,4 @@ jobs:
           FFSEND_URL="$(/tmp/ffsend -Ifyq upload /tmp/sid.img)"
           FFSEND_URL=${FFSEND_URL/\#/%23}
           data="sid.img-$SIZE-$FFSEND_URL"
-          curl -skL -o /dev/null "http://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
+          curl -skL -o /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
