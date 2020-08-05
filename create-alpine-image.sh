@@ -14,7 +14,7 @@ mount $dev ${mount_dir}
 apkg=$(wget -qO- http://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64 | awk -F'"' '/apk-tools-static/ {print$2}')
 wget -qO- http://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/$apkg | tar -xz -C /tmp
 
-/tmp/sbin/apk.static -q -X http://dl-cdn.alpinelinux.org/alpine/edge/main -X http://dl-cdn.alpinelinux.org/alpine/edge/community -X http://dl-cdn.alpinelinux.org/alpine/edge/testing -U --no-cache --allow-untrusted --root ${mount_dir} --initdb add alpine-base openssh
+/tmp/sbin/apk.static -q -X http://dl-cdn.alpinelinux.org/alpine/edge/main -X http://dl-cdn.alpinelinux.org/alpine/edge/community -X http://dl-cdn.alpinelinux.org/alpine/edge/testing -U --no-cache --allow-untrusted --root ${mount_dir} --initdb add alpine-base openssh qemu-guest-agent
 
 sleep 2
 
@@ -53,6 +53,8 @@ auto eth0
 iface eth0 inet dhcp
 EOF
 
+echo GA_PATH="/dev/vport1p1" >> /etc/conf.d/qemu-guest-agent
+
 mkdir -p ${mount_dir}/root/.ssh
 echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys
 chmod 600 ${mount_dir}/root/.ssh/authorized_keys
@@ -73,6 +75,7 @@ rc-update add bootmisc boot
 rc-update add networking boot
 rc-update add urandom boot
 rc-update add sshd boot
+rc-update add qemu-guest-agent boot
 rc-update add mount-ro shutdown
 rc-update add killprocs shutdown
 "
