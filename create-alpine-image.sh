@@ -53,7 +53,7 @@ auto eth0
 iface eth0 inet dhcp
 EOF
 
-echo GA_PATH="/dev/vport1p1" >> /etc/conf.d/qemu-guest-agent
+echo GA_PATH="/dev/vport1p1" >> ${mount_dir}/etc/conf.d/qemu-guest-agent
 
 mkdir -p ${mount_dir}/root/.ssh
 echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys
