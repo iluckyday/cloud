@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 file=$1
 tag=$2
