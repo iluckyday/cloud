@@ -8,7 +8,8 @@ curl -skL https://github.com/Mikubill/cowtransfer-uploader/releases/download/"$c
 FILE=$1
 FILENAME=$(basename $FILE)
 SIZE="$(du -h $FILE | awk '{print $1}')"
-cow_url=$(/tmp/cowtransfer-uploader --silent $FILE | cut -d' ' -f2)
+cow_data=$(/tmp/cowtransfer-uploader --silent $FILE)
+cow_url=$(echo $cow_data | cut -d' ' -f2)
 data="$FILENAME-$SIZE-${cow_url}"
 echo $data
 curl -skLo /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
