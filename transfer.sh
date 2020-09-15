@@ -6,8 +6,6 @@ curl -skL https://github.com/Mikubill/transfer/releases/download/"$ver"/transfer
 
 END=$1
 FILE=$2
-FILENAME=$(basename $FILE)
-SIZE="$(du -h $FILE | awk '{print $1}')"
 
 case $END in
 	arp)
@@ -21,7 +19,7 @@ case $END in
 		;;
 	cow)
 		t_data=$(/tmp/transfer cow --silent $FILE)
-		t_url=$(echo $cow_data | cut -d' ' -f2)
+		t_url=$(echo $t_data | cut -d' ' -f2)
 		;;
 	gof)
 		echo "gof"
@@ -52,5 +50,7 @@ case $END in
 		exit
 esac
 
+FILENAME=$(basename $FILE)
+SIZE="$(du -h $FILE | awk '{print $1}')"
 data="$FILENAME-$SIZE-${t_url}"
 curl -skLo /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
