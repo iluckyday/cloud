@@ -19,7 +19,6 @@ case $END in
 		;;
 	cow)
 		t_data=$(/tmp/transfer cow --silent $FILE)
-		t_url=$(echo $t_data | cut -d' ' -f2)
 		;;
 	gof)
 		echo "gof"
