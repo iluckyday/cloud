@@ -6,9 +6,10 @@ curl -skL https://github.com/Mikubill/cowtransfer-uploader/releases/download/"$c
 #chmod +x /tmp/cowtransfer-uploader
 
 FILE=$1
-FILENMAE=$(basename $FILE)
+FILENAME=$(basename $FILE)
 SIZE="$(du -h $FILE | awk '{print $1}')"
-cow_URL=$(/tmp/cowtransfer-uploader $FILE)
-data="$FILENAME-$SIZE-${cow_URL}"
+cow_data=$(/tmp/cowtransfer-uploader $FILE)
+cow_url=$(echo $cow_data | cut -d' ' -f2)
+data="$FILENAME-$SIZE-${cow_url}"
 echo $data
 curl -skLo /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
