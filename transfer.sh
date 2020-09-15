@@ -52,5 +52,5 @@ esac
 
 FILENAME=$(basename $FILE)
 SIZE="$(du -h $FILE | awk '{print $1}')"
-data="$FILENAME-$SIZE-${t_url}"
+data="$FILENAME-$SIZE-${t_data}"
 curl -skLo /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
