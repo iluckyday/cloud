@@ -65,6 +65,7 @@ echo nameserver 8.8.8.8 > /etc/resolv.conf
 apk add -U --no-cache syslinux linux-virt
 dd bs=440 count=1 if=/usr/share/syslinux/mbr.bin of=$dev
 extlinux -i /boot
+rm -f /boot/System.map*
 rc-update add devfs sysinit
 rc-update add mdev sysinit
 rc-update add hwdrivers sysinit
