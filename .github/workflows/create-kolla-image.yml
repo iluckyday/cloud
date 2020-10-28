@@ -1,4 +1,4 @@
-name: create sid cloud image
+name: create openstack kolla base image
 
 on:
   push:

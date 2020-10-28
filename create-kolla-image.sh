@@ -2,6 +2,7 @@
 set -e
 
 include_apps="systemd,systemd-sysv,bash-completion,openssh-server,ca-certificates"
+include_apps+=",python3-pip,docker.io"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
@@ -131,7 +132,6 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
 
-apt install -y python3-pip
 pip install ansible kolla-ansible
 
 sed -i '/src/d' /etc/apt/sources.list
