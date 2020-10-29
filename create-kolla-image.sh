@@ -119,7 +119,7 @@ LABEL debian
         APPEND root=LABEL=debian-root quiet
 EOF
 
-chroot ${mount_dir} /bin/bash -c "
+chroot --userspec=root:root ${mount_dir} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
 apt update
@@ -132,7 +132,7 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
 
-pip install ansible kolla-ansible
+pip install --no-cache-dir ansible kolla-ansible
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
