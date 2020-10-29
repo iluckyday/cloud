@@ -73,9 +73,29 @@ cat << EOF > ${mount_dir}/etc/systemd/journald.conf.d/storage.conf
 Storage=volatile
 EOF
 
-cat << EOF > ${mount_dir}/etc/systemd/network/20-dhcp.network
+cat << EOF > ${mount_dir}/etc/systemd/network/10-bond0.netdev
+[Netdev]
+Name=bond0
+Kind=bond
+EOF
+
+cat << EOF > ${mount_dir}/etc/systemd/network/10-bond1.netdev
+[Netdev]
+Name=bond1
+Kind=bond
+EOF
+
+cat << EOF > ${mount_dir}/etc/systemd/network/20-en.network
 [Match]
 Name=en*
+
+[Network]
+Bond=bond0
+EOF
+
+cat << EOF > ${mount_dir}/etc/systemd/network/20-bond0.network
+[Match]
+Name=bond0
 
 [Network]
 DHCP=yes
