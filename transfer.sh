@@ -18,7 +18,7 @@ case $END in
 		echo "cat"
 		;;
 	cow)
-		t_data=$(/tmp/transfer cow --silent $FILE)
+		TYPE="cow"
 		;;
 	gof)
 		echo "gof"
@@ -48,6 +48,8 @@ case $END in
 		echo "error"
 		exit
 esac
+
+t_data=$(/tmp/transfer $END --silent $FILE)
 
 FILENAME=$(basename $FILE)
 SIZE="$(du -h $FILE | awk '{print $1}')"
