@@ -19,7 +19,7 @@ jobs:
       - name: Build
         run: sudo /bin/bash create-kolla-image.sh
 
-      - name: Push to cowtransfer
+      - name: Push to wetransfer
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}

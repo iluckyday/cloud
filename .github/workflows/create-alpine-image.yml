@@ -19,31 +19,8 @@ jobs:
       - name: Build
         run: sudo /bin/bash create-alpine-image.sh
 
-#      - name: Install ffsend
-#        run: |
-#          ffsend_ver="$(curl -skL https://api.github.com/repos/timvisee/ffsend/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
-#          curl -skL -o /tmp/ffsend https://github.com/timvisee/ffsend/releases/download/"$ffsend_ver"/ffsend-"$ffsend_ver"-linux-x64-static
-#          chmod +x /tmp/ffsend
-
-#      - name: Push to Firefox Send
-#        env:
-#          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
-#          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-#        run: |
-#          SIZE="$(du -h /tmp/alpine.img | awk '{print $1}')"
-#          FFSEND_URL="$(/tmp/ffsend -Ifyq upload /tmp/alpine.img)"
-#          FFSEND_URL=${FFSEND_URL/\#/%23}
-#          data="alpine.img-$SIZE-$FFSEND_URL"
-#          curl -skL -o /dev/null "https://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSHER_APPTOKEN}&uid=${WXPUSHER_UID}&content=${data}"
-
-#      - name: Push to ACR
-#        env:
-#          ACR_DOCKER_USERNAME: ${{ secrets.ACR_DOCKER_USERNAME }}
-#          ACR_DOCKER_PASSWORD: ${{ secrets.ACR_DOCKER_PASSWORD }}
-#        run: bash acr.sh /tmp/alpine.img $(date '+%Y%m%d') cn-chengdu iimage
-
-      - name: Push to cowtransfer
+      - name: Push to wetransfer
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: bash transfer.sh cow /tmp/alpine.img
+        run: bash transfer.sh wet /tmp/alpine.img
