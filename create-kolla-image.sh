@@ -74,13 +74,13 @@ Storage=volatile
 EOF
 
 cat << EOF > ${mount_dir}/etc/systemd/network/10-bond0.netdev
-[Netdev]
+[NetDev]
 Name=bond0
 Kind=bond
 EOF
 
 cat << EOF > ${mount_dir}/etc/systemd/network/10-bond1.netdev
-[Netdev]
+[NetDev]
 Name=bond1
 Kind=bond
 EOF
@@ -152,7 +152,7 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
 
-pip install --no-cache-dir 'ansible<2.10' kolla-ansible
+pip install --no-cache-dir 'ansible<2.10' kolla-ansible docker
 #pip install --no-cache-dir ansible kolla-ansible
 
 sed -i '/src/d' /etc/apt/sources.list
