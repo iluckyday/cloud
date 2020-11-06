@@ -152,7 +152,7 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 apt remove -y --purge tzdata
 
-pip install --no-cache-dir 'ansible<2.10' kolla-ansible docker
+pip install --no-cache-dir 'ansible<2.10' kolla-ansible docker python3-openstackclient
 #pip install --no-cache-dir ansible kolla-ansible
 
 sed -i '/src/d' /etc/apt/sources.list
