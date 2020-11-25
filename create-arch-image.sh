@@ -21,7 +21,7 @@ ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
 pacman-key --populate archlinux
 mount $loopx /mnt
-/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail --ignore tzdata
+/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
 "
 
 root_dir=${rootpath}/mnt
@@ -101,7 +101,7 @@ rm -rf /boot/initramfs-linux-fallback.img
 grub-install --force $loopx
 grub-mkconfig -o /boot/grub/grub.cfg
 
-rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
+rm -rf /var/log/* /usr/share/zoneinfo/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
 "
 
 umount ${root_dir}/dev ${root_dir}/proc ${root_dir}/sys
