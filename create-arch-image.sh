@@ -21,7 +21,7 @@ ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
 pacman-key --populate archlinux
 mount $loopx /mnt
-/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
+/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail --ignore tzdata
 "
 
 root_dir=${rootpath}/mnt
@@ -76,26 +76,31 @@ man-db.timer
 shadow.timer
 EOF
 
-mkdir -p ${root_dir}/boot/syslinux
-cat << EOF > ${root_dir}/boot/syslinux/syslinux.cfg
-PROMPT 0
-TIMEOUT 0
-DEFAULT arch
-LABEL arch
-        LINUX /boot/vmlinuz-linux
-        INITRD /boot/initramfs-linux.img
-        APPEND root=LABEL=arch-root quiet console=ttyS0
-EOF
+cat << ZONE | base64 -d | gzip -d > ${root_dir}/etc/localtime                                                                                                            
+H4sIAAAAAAAAA6XQPy9DURjH8afqb2O4sQqOotrBYhAJkdJKI6mFuzDUpNLtml03J2FiubuFF+AN                                                                                 
+SKSrpluL6rs46Wbi+d6dRJybcz7r/X3940Z9VX4903rTeietPi9HNdua+Axa3Wdpj9y4dliUzsaW                                                                                 
+695e2NedR/e2m5X3atP1NpvyMVoP+jMD298O3ezTgZlr3MUmur6f37uMs2cPZqFwEi9WrszSVOjl                                                                                 
+lk9NblDz8mMVk+8UvaHUj5/IeY//iuLUsEhgZby670uprPfQF/8Pg770RGulAjIMGZeoA5GRiToU                                                                                 
+GYsMRkYjw5HxSAAkAhIiUWPwEwRBoiBhkDhIICQSEgqJhQRL1GhIuMT/xMvos7Ke+QZZ1SrKFQIA                                                                                 
+AA==                                                                                                                                                         
+ZONE
 
 mount -o bind /dev ${root_dir}/dev
 mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
 chroot ${root_dir} /bin/bash -c "
-grub-install --force $loopx
-grub-mkconfig -o /boot/grub/grub.cfg
+copy /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
+mkinitcpio -z zstd -g /boot/initramfs-linux.img
+rm -rf /boot/initramfs-linux-fallback.img
+
+grub-install --force $loopx
+grub-mkconfig -o /boot/grub/grub.cfg
+
 rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
 "
 
