@@ -76,15 +76,6 @@ man-db.timer
 shadow.timer
 EOF
 
-cat << ZONE | base64 -d | gzip -d > ${root_dir}/etc/localtime                                                                                                            
-H4sIAAAAAAAAA6XQPy9DURjH8afqb2O4sQqOotrBYhAJkdJKI6mFuzDUpNLtml03J2FiubuFF+AN                                                                                 
-SKSrpluL6rs46Wbi+d6dRJybcz7r/X3940Z9VX4903rTeietPi9HNdua+Axa3Wdpj9y4dliUzsaW                                                                                 
-695e2NedR/e2m5X3atP1NpvyMVoP+jMD298O3ezTgZlr3MUmur6f37uMs2cPZqFwEi9WrszSVOjl                                                                                 
-lk9NblDz8mMVk+8UvaHUj5/IeY//iuLUsEhgZby670uprPfQF/8Pg770RGulAjIMGZeoA5GRiToU                                                                                 
-GYsMRkYjw5HxSAAkAhIiUWPwEwRBoiBhkDhIICQSEgqJhQRL1GhIuMT/xMvos7Ke+QZZ1SrKFQIA                                                                                 
-AA==                                                                                                                                                         
-ZONE
-
 mount -o bind /dev ${root_dir}/dev
 mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
