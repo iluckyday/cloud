@@ -21,7 +21,7 @@ ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
 pacman-key --populate archlinux
 mount $loopx /mnt
-/usr/bin/pacstrap -i -c /mnt mkinitcpio grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
+/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
 "
 
 root_dir=${rootpath}/mnt
@@ -80,12 +80,8 @@ mount -o bind /dev ${root_dir}/dev
 mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
-sed -i "s/ 'fallback'//" ${root_dir}/etc/mkinitcpio.d/linux.preset
-echo 'MODULES=(virtio_blk)' >> ${root_dir}/etc/mkinitcpio.d/linux.preset
-echo 'COMPRESSION="zstd"' >> ${root_dir}/etc/mkinitcpio.d/linux.preset
-
 echo GRUB_TIMEOUT=0 >> ${root_dir}/etc/default/grub
-echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0 quiet"'  >> ${root_dir}/etc/default/grub
+echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0 quiet"' >> ${root_dir}/etc/default/grub
 
 ${rootpath}/bin/arch-chroot ${rootpath} /usr/bin/pacstrap -i -c /mnt linux
 
@@ -93,6 +89,12 @@ chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
+echo 'COMPRESSION="zstd"' >> /etc/mkinitcpio.d/linux.preset
+
+mkinitcpio -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
 grub-mkconfig -o /boot/grub/grub.cfg
