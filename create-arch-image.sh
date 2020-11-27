@@ -81,14 +81,14 @@ mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
 echo GRUB_TIMEOUT=0 >> ${root_dir}/etc/default/grub
-echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0 quiet"' >> ${root_dir}/etc/default/grub
+echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 quiet"' >> ${root_dir}/etc/default/grub
 
 chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
+echo 'MODULES=(virtio virtio_ring virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
 echo 'COMPRESSION="zstd"' >> /etc/mkinitcpio.d/linux.preset
 
 mkinitcpio -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
