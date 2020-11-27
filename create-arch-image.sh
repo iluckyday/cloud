@@ -88,10 +88,9 @@ cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
-echo 'HOOKS=(base udev filesystems)' >> /etc/mkinitcpio.d/linux.preset
+echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.conf
 
-mkinitcpio -v -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -v -z zstd -S autodetect,modconf,block,keyboard,fsck -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
