@@ -81,22 +81,21 @@ mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
 echo GRUB_TIMEOUT=0 >> ${root_dir}/etc/default/grub
-echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 quiet"' >> ${root_dir}/etc/default/grub
+echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0 console=tty1"' >> ${root_dir}/etc/default/grub
 
 chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-echo 'MODULES=(virtio_blk ext4)' >> /etc/mkinitcpio.conf
-
-mkinitcpio -v -z zstd -S autodetect,modconf,block,fsck,filesystems -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
 grub-mkconfig -o /boot/grub/grub.cfg
 
-rm -rf /var/log/* /usr/share/zoneinfo/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
+rm -rf /usr/share/zoneinfo/*
+rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
 "
 
 umount ${root_dir}/dev ${root_dir}/proc ${root_dir}/sys
