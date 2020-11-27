@@ -21,7 +21,7 @@ ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
 pacman-key --populate archlinux
 mount $loopx /mnt
-/usr/bin/pacstrap -i -c /mnt grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
+/usr/bin/pacstrap -i -c /mnt mkinitcpio grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
 "
 
 root_dir=${rootpath}/mnt
@@ -80,7 +80,7 @@ mount -o bind /dev ${root_dir}/dev
 mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
-sed -i "s/ 'fallback'//" /etc/mkinitcpio.d/linux.preset
+sed -i "s/ 'fallback'//" ${root_dir}/etc/mkinitcpio.d/linux.preset
 echo 'MODULES=(virtio_blk)' >> ${root_dir}/etc/mkinitcpio.d/linux.preset
 echo 'COMPRESSION="zstd"' >> ${root_dir}/etc/mkinitcpio.d/linux.preset
 
