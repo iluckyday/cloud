@@ -83,8 +83,6 @@ mount -o bind /sys ${root_dir}/sys
 echo GRUB_TIMEOUT=0 >> ${root_dir}/etc/default/grub
 echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0 quiet"' >> ${root_dir}/etc/default/grub
 
-${rootpath}/bin/arch-chroot ${rootpath} /usr/bin/pacstrap -i -c /mnt linux
-
 chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
