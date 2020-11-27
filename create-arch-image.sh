@@ -88,10 +88,10 @@ cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-echo 'MODULES=(virtio virtio_ring virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
+echo 'MODULES=(virtio_blk)' >> /etc/mkinitcpio.d/linux.preset
 echo 'COMPRESSION="zstd"' >> /etc/mkinitcpio.d/linux.preset
 
-mkinitcpio -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -v -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
