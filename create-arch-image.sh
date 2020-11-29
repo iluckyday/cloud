@@ -81,7 +81,7 @@ mount -o bind /proc ${root_dir}/proc
 mount -o bind /sys ${root_dir}/sys
 
 echo GRUB_TIMEOUT=0 >> ${root_dir}/etc/default/grub
-echo 'GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on console=ttyS0 console=tty1"' >> ${root_dir}/etc/default/grub
+echo 'GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt console=ttyS0 console=tty1"' >> ${root_dir}/etc/default/grub
 
 chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
