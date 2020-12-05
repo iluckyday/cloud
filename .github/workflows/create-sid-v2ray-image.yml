@@ -1,0 +1,26 @@
+name: create sid with v2ray cloud image
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron:  "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: fast sources.list
+        run: sudo sed -i '/src/d' /etc/apt/sources.list && sudo rm -rf /etc/apt/sources.list.d
+
+      - name: Build
+        run: sudo /bin/bash create-sid-v2ray-image.sh
+
+      - name: Push to wetransfer
+        env:
+          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
+          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
+        run: bash transfer.sh wet /tmp/vsid.img
