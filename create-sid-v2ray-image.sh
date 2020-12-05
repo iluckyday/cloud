@@ -3,7 +3,7 @@ set -e
 
 include_apps="systemd,systemd-sysv,bash-completion,openssh-server,ca-certificates,v2ray"
 exclude_apps="unattended-upgrades"
-enable_services="systemd-networkd.service ssh.service v2ray.service"
+enable_services="systemd-networkd.service ssh.service v2ray.service resizefs-root.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
@@ -13,7 +13,7 @@ apt install -y debootstrap qemu-utils
 
 mount_dir=/tmp/debian
 
-qemu-img create -f raw /tmp/sid.raw 201G
+qemu-img create -f raw /tmp/sid.raw 2G
 loopx=$(losetup --show -f -P /tmp/sid.raw)
 
 mkfs.ext4 -F -L debian-root -b 1024 -I 128 -O "^has_journal" $loopx
@@ -83,6 +83,19 @@ EOF
 
 cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
+EOF
+
+cat << "EOF" > ${mount_dir}/etc/systemd/system/resizefs-root.service
+[Unit]
+Description=Resize root file system
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "resize2fs $(blkid -o device)"
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
 sed -i '0,/#\?\(ListenAddress\s*\).*$/ s//\1127.0.0.1/' ${mount_dir}/etc/ssh/sshd_config
