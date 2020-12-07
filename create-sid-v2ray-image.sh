@@ -40,7 +40,7 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2h
 chmod 600 ${mount_dir}/root/.ssh/authorized_keys
 
 mkdir -p ${mount_dir}/etc/apt/apt.conf.d
-cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99-freedisk
+cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99freedisk
 APT::Authentication "0";
 APT::Get::AllowUnauthenticated "1";
 Dir::Cache "/dev/shm";
@@ -55,7 +55,7 @@ APT::Install-Suggests "0";
 EOF
 
 mkdir -p ${mount_dir}/etc/dpkg/dpkg.cfg.d
-cat << EOF > ${mount_dir}/etc/dpkg/dpkg.cfg.d/99-nodoc
+cat << EOF > ${mount_dir}/etc/dpkg/dpkg.cfg.d/99nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
