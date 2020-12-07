@@ -17,11 +17,12 @@ jobs:
         run: sudo sed -i '/src/d' /etc/apt/sources.list && sudo rm -rf /etc/apt/sources.list.d
 
       - name: Build
+        env:
+          VUUID: ${{ secrets.VUUID }}
         run: sudo /bin/bash create-sid-v2ray-image.sh
 
       - name: Push to wetransfer
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-          VUUID: ${{ secrets.VUUID }}
         run: bash transfer.sh wet /tmp/vsid.img
