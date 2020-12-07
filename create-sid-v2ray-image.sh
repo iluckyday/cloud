@@ -106,11 +106,11 @@ cat << EOF > ${mount_dir}/etc/v2ray/config.json
     "loglevel": "none"
   },
   "inbounds": [{
-    "port": 443,
+    "port": 3443,
     "protocol": "vmess",
     "settings": {
       "clients": [{
-        "id": "35d169dc-ae92-f3bf-d84e-c23f4d197b1e"
+        "id": "$VUUID"
       }]
     }
   }],
@@ -149,8 +149,6 @@ rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/m
 rm -rf /etc/v2ray/geoip.dat /etc/v2ray/geosite.dat
 find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 "
-
-echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
 
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys

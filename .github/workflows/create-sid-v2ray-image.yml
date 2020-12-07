@@ -23,4 +23,5 @@ jobs:
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
+          VUUID: ${{ secrets.VUUID }}
         run: bash transfer.sh wet /tmp/vsid.img
