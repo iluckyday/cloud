@@ -19,7 +19,7 @@ jobs:
       - name: Build
         env:
           VUUID: ${{ secrets.VUUID }}
-        run: sudo /bin/bash create-sid-v2ray-image.sh
+        run: sudo -E /bin/bash create-sid-v2ray-image.sh
 
       - name: Push to wetransfer
         env:
