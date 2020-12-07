@@ -130,7 +130,7 @@ DEFAULT debian
 LABEL debian
         LINUX /vmlinuz
         INITRD /initrd.img
-        APPEND root=LABEL=debian-root quiet intel_iommu=on iommu=pt
+        APPEND root=LABEL=debian-root quiet console=tty1 console=ttyS0
 EOF
 
 chroot ${mount_dir} /bin/bash -c "
