@@ -110,7 +110,7 @@ cat << EOF > ${mount_dir}/etc/v2ray/config.json
     "protocol": "vmess",
     "settings": {
       "clients": [{
-        "id": "$VUUID"
+        "id": "${VUUID}"
       }]
     }
   }],
