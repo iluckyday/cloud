@@ -81,6 +81,11 @@ DHCP=yes
 IPv6AcceptRA=yes
 EOF
 
+cat << EOF > ${mount_dir}/etc/sysctl.d/10-tcp_bbr.conf
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOF
+
 cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
@@ -142,6 +147,7 @@ extlinux -i /boot/syslinux
 
 systemctl enable $enable_services
 systemctl disable $disable_services
+systemctl mask getty@.service
 apt remove -y --purge tzdata
 
 sed -i '/src/d' /etc/apt/sources.list
