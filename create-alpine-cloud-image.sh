@@ -35,7 +35,7 @@ tty0::respawn:/sbin/getty 38400 tty0
 ::shutdown:/sbin/openrc shutdown
 EOF
 
-cat << EOF > ${mount_dir}/etc/init.d/resizefs-root
+cat << "EOF" > ${mount_dir}/etc/init.d/resizefs-root
 #!/sbin/openrc-run
 name="cloud-init resize rootfs"
 command="/usr/sbin/resize2fs $(blkid -o device)"
@@ -96,7 +96,7 @@ DEFAULT alpine
 LABEL alpine
     LINUX vmlinuz-virt
     INITRD initramfs-virt
-    APPEND root=LABEL=alpine-root modules=ext4 quiet
+    APPEND root=LABEL=alpine-root modules=ext4 quiet console=tty0 console=ttyS0
 EOF
 
 
