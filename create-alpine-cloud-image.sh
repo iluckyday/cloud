@@ -38,7 +38,7 @@ EOF
 cat << "EOF" > ${mount_dir}/etc/init.d/resizefs-root
 #!/sbin/openrc-run
 name="cloud-init resize rootfs"
-command="/usr/sbin/resize2fs $(blkid -o device)"
+command="/usr/sbin/resize2fs -f $(blkid -o device)"
 EOF
 chmod +x ${mount_dir}/etc/init.d/resizefs-root
 
@@ -76,13 +76,13 @@ rm -f /boot/System.map*
 rc-update add devfs sysinit
 rc-update add mdev sysinit
 rc-update add hwdrivers sysinit
-rc-update add resizefs-root sysinit
 rc-update add modules boot
 rc-update add sysctl boot
 rc-update add hostname boot
 rc-update add bootmisc boot
 rc-update add networking boot
 rc-update add urandom boot
+rc-update add resizefs-root boot
 rc-update add sshd boot
 rc-update add qemu-guest-agent boot
 rc-update add mount-ro shutdown
