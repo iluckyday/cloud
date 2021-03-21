@@ -16,6 +16,7 @@ loopx=$(losetup --show -f -P /tmp/arch.raw)
 mkfs.ext4 -F -L arch-root -b 1024 -I 128 -O "^has_journal" $loopx
 
 echo 'Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch' > ${rootpath}/etc/pacman.d/mirrorlist
+sed -i 's|#NoExtract   =|NoExtract   = *__pycache__* usr/share/doc/* usr/share/doc/*|' ${rootpath}/etc/pacman.conf
 
 ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
@@ -88,7 +89,7 @@ cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-mkinitcpio -S autodetect -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -S autodetect,encrypt,fsck,keyboard,keymap,memdisk,modconf,resume,sd-encrypt,sd-shutdown,sd-vconsole,shutdown,sleep -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
