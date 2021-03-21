@@ -88,7 +88,7 @@ cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-mkinitcpio -A virtio -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -A block -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
