@@ -42,6 +42,7 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2h
 chmod 600 ${root_dir}/root/.ssh/authorized_keys
 
 echo 'Server = https://mirrors.aliyun.com/archlinux/$repo/os/$arch' > ${root_dir}/etc/pacman.d/mirrorlist
+sed -i 's|#NoExtract   =|NoExtract   = *__pycache__* usr/share/doc/* usr/share/doc/*|' ${root_dir}/etc/pacman.conf
 
 cat << EOF > ${root_dir}/etc/systemd/network/20-dhcp.network
 [Match]
@@ -89,7 +90,7 @@ cp /etc/skel/.bash_profile /root
 systemctl enable systemd-networkd systemd-resolved sshd
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-mkinitcpio -S autodetect,encrypt,fsck,keyboard,keymap,memdisk,modconf,resume,sd-encrypt,sd-shutdown,sd-vconsole,shutdown,sleep -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+mkinitcpio -S autodetect -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
 rm -f /boot/initramfs-linux-fallback.img
 
 grub-install --force $loopx
