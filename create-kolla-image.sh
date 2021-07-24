@@ -150,7 +150,6 @@ busybox --install -s /bin
 
 systemctl enable $enable_services
 systemctl disable $disable_services
-apt remove -y --purge tzdata
 
 pip install --no-cache-dir 'ansible<2.10' kolla-ansible docker python-openstackclient
 #pip install --no-cache-dir ansible kolla-ansible
