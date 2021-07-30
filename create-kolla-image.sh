@@ -151,11 +151,11 @@ busybox --install -s /bin
 systemctl enable $enable_services
 systemctl disable $disable_services
 
-pip install --no-cache-dir 'ansible<2.10' kolla-ansible docker python-openstackclient
+pip install --no-cache-dir 'ansible<3.0' kolla-ansible docker python-openstackclient
 #pip install --no-cache-dir ansible kolla-ansible
 
 sed -i '/src/d' /etc/apt/sources.list
-rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
+rm -rf /etc/hostname /etc/resolv.conf /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
 find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 find /usr -type d -name __pycache__ -prune -exec rm -rf {} +
 find /usr -type d -name tests -prune -exec rm -rf {} +
