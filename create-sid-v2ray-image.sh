@@ -166,6 +166,8 @@ find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
 sleep 1
+killall -r provjobd || true
+sleep 1
 umount ${mount_dir}
 sleep 1
 losetup -d $loopx

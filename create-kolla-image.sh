@@ -166,6 +166,8 @@ echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
 sleep 1
+killall -r provjobd || true
+sleep 1
 umount ${mount_dir}
 sleep 1
 losetup -d $loopx

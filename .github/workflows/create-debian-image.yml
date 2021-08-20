@@ -23,4 +23,4 @@ jobs:
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: bash transfer.sh wet $(ls /tmp/debain-*.img)
+        run: bash transfer.sh wet /tmp/debian-*.img

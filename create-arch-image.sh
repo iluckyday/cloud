@@ -102,6 +102,8 @@ rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cac
 
 umount ${root_dir}/dev ${root_dir}/proc ${root_dir}/sys
 sleep 1
+killall -r provjobd || true
+sleep 1
 umount $loopx
 sleep 1
 losetup -d $loopx
