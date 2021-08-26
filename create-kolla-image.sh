@@ -2,7 +2,7 @@
 set -e
 
 include_apps="systemd,systemd-sysv,bash-completion,openssh-server,ca-certificates"
-include_apps+=",docker.io,python3-pip,python3-dev,libffi-dev,gcc,libssl-dev"
+include_apps+=",docker.io,python3-pip,python3-dev,libffi-dev,gcc,libssl-dev,apparmor,sudo"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
@@ -79,21 +79,29 @@ Name=bond0
 Kind=bond
 EOF
 
-cat << EOF > ${mount_dir}/etc/systemd/network/10-bond1.netdev
+cat << EOF > ${mount_dir}/etc/systemd/network/20-bond1.netdev
 [NetDev]
 Name=bond1
 Kind=bond
 EOF
 
-cat << EOF > ${mount_dir}/etc/systemd/network/20-en.network
+cat << EOF > ${mount_dir}/etc/systemd/network/30-en.network
 [Match]
-Name=en*
+Name=en*10
 
 [Network]
 Bond=bond0
 EOF
 
-cat << EOF > ${mount_dir}/etc/systemd/network/20-bond0.network
+cat << EOF > ${mount_dir}/etc/systemd/network/31-en.network
+[Match]
+Name=en*20
+
+[Network]
+Bond=bond1
+EOF
+
+cat << EOF > ${mount_dir}/etc/systemd/network/10-bond0.network
 [Match]
 Name=bond0
 
@@ -151,8 +159,10 @@ busybox --install -s /bin
 systemctl enable $enable_services
 systemctl disable $disable_services
 
-pip install --no-cache-dir 'ansible<3.0' kolla-ansible docker python-openstackclient
-#pip install --no-cache-dir ansible kolla-ansible
+#pip install --no-cache-dir 'ansible<3.0' kolla-ansible docker python-openstackclient
+
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 ansible python3-openstackclient
+pip install --no-cache-dir kolla-ansible docker
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
