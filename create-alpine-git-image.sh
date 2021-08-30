@@ -14,7 +14,7 @@ mount $dev ${mount_dir}
 apkg=$(wget -qO- http://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64 | awk -F'"' '/apk-tools-static/ {print$2}')
 wget -qO- http://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/$apkg | tar -xz -C /tmp
 
-/tmp/sbin/apk.static -q -X http://dl-cdn.alpinelinux.org/alpine/edge/main -X http://dl-cdn.alpinelinux.org/alpine/edge/community -X http://dl-cdn.alpinelinux.org/alpine/edge/testing -U --no-cache --allow-untrusted --root ${mount_dir} --initdb add alpine-base openssh qemu-guest-agent git expect bash
+/tmp/sbin/apk.static -q -X http://dl-cdn.alpinelinux.org/alpine/edge/main -X http://dl-cdn.alpinelinux.org/alpine/edge/community -X http://dl-cdn.alpinelinux.org/alpine/edge/testing -U --no-cache --allow-untrusted --root ${mount_dir} --initdb add alpine-base openssh qemu-guest-agent git expect
 
 sleep 2
 
