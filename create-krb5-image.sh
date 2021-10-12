@@ -2,11 +2,12 @@
 set -e
 
 include_apps="systemd,systemd-sysv,openssh-server,ca-certificates"
-include_apps+=",krb5-admin-server"
+include_apps+=",netbase,krb5-admin-server,krb5-kpropd"
+include_apps+=",slapd,ldap-utils"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
-disable_services+=" krb5-admin-server.service krb5-kdc.service"
+disable_services+=" krb5-admin-server.service krb5-kdc.service krb5-kpropd.service"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
