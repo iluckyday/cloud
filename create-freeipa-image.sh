@@ -2,12 +2,10 @@
 set -e
 
 include_apps="systemd,systemd-sysv,openssh-server,ca-certificates"
-include_apps+=",netbase,krb5-kdc,krb5-admin-server,krb5-kpropd,krb5-kdc-ldap"
-include_apps+=",slapd,ldap-utils"
+include_apps+=",freeipa-server,freeipa-server-dns,freeipa-server-trust-ad"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
-disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
-disable_services+=" krb5-admin-server.service krb5-kdc.service krb5-kpropd.service"
+disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer e2scrub_reap.service"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -77,7 +75,7 @@ EOF
 
 cat << EOF > ${mount_dir}/etc/systemd/network/20-dhcp.network
 [Match]
-Name=en*10
+Name=en*
 
 [Network]
 DHCP=yes
@@ -129,4 +127,4 @@ umount ${mount_dir}
 sleep 1
 losetup -d $loopx
 
-qemu-img convert -c -f raw -O qcow2 /tmp/sid.raw /tmp/krb5.img
+qemu-img convert -c -f raw -O qcow2 /tmp/sid.raw /tmp/freeipa.img
