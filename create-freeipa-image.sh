@@ -2,7 +2,6 @@
 set -e
 
 include_apps="systemd,systemd-sysv,openssh-server,ca-certificates"
-include_apps+=",freeipa-server,freeipa-server-dns,freeipa-server-trust-ad"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer e2scrub_reap.service"
@@ -103,6 +102,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools busybox
+apt install -y freeipa-server freeipa-server-dns freeipa-server-trust-ad
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
 busybox --install -s /bin
