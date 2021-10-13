@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-include_apps="systemd,systemd-sysv,openssh-server,ca-certificates"
+include_apps="systemd,systemd-sysv,openssh-server,ca-certificates,bash-completion"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer e2scrub_reap.service"
@@ -81,6 +81,27 @@ DHCP=yes
 IPv6AcceptRA=yes
 EOF
 
+mkdir -p ${MNTDIR}/etc/systemd/system-environment-generators
+cat << EOF > ${MNTDIR}/etc/systemd/system-environment-generators/20-python
+#!/bin/sh
+echo 'PYTHONDONTWRITEBYTECODE=1'
+echo 'PYTHONSTARTUP=/usr/lib/pythonstartup'
+EOF
+chmod +x ${MNTDIR}/etc/systemd/system-environment-generators/20-python
+
+cat << EOF > ${MNTDIR}/etc/profile.d/python.sh
+#!/bin/sh
+export PYTHONDONTWRITEBYTECODE=1 PYTHONSTARTUP=/usr/lib/pythonstartup
+EOF
+
+cat << EOF > ${MNTDIR}/usr/lib/pythonstartup
+import readline
+import time
+
+readline.add_history("# " + time.asctime())
+readline.set_history_length(-1)
+EOF
+
 cat << EOF > ${mount_dir}/root/.bashrc
 export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 EOF
@@ -102,7 +123,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools busybox
-apt install -y freeipa-server freeipa-server-dns freeipa-server-trust-ad
+apt install -y freeipa-server freeipa-server-dns freeipa-server-trust-ad python3-incremental
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
 busybox --install -s /bin
