@@ -2,6 +2,7 @@
 set -e
 
 include_apps="systemd,systemd-sysv,openssh-server,ca-certificates,bash-completion"
+include_apps+=",locales"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer e2scrub_reap.service"
@@ -40,7 +41,7 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2h
 chmod 600 ${mount_dir}/root/.ssh/authorized_keys
 
 mkdir -p ${mount_dir}/etc/apt/apt.conf.d
-cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99-freedisk
+cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99freedisk
 APT::Authentication "0";
 APT::Get::AllowUnauthenticated "1";
 Dir::Cache "/dev/shm";
@@ -55,15 +56,13 @@ APT::Install-Suggests "0";
 EOF
 
 mkdir -p ${mount_dir}/etc/dpkg/dpkg.cfg.d
-cat << EOF > ${mount_dir}/etc/dpkg/dpkg.cfg.d/99-nodoc
+cat << EOF > ${mount_dir}/etc/dpkg/dpkg.cfg.d/99nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
 path-exclude /usr/share/info/*
 path-exclude /usr/share/lintian/*
 path-exclude /usr/share/linda/*
-path-exclude /usr/share/locale/*
-path-include /usr/share/locale/en*
 EOF
 
 mkdir -p ${mount_dir}/etc/systemd/journald.conf.d
@@ -81,20 +80,20 @@ DHCP=yes
 IPv6AcceptRA=yes
 EOF
 
-mkdir -p ${MNTDIR}/etc/systemd/system-environment-generators
-cat << EOF > ${MNTDIR}/etc/systemd/system-environment-generators/20-python
+mkdir -p ${mount_dir}/etc/systemd/system-environment-generators
+cat << EOF > ${mount_dir}/etc/systemd/system-environment-generators/20-python
 #!/bin/sh
 echo 'PYTHONDONTWRITEBYTECODE=1'
 echo 'PYTHONSTARTUP=/usr/lib/pythonstartup'
 EOF
-chmod +x ${MNTDIR}/etc/systemd/system-environment-generators/20-python
+chmod +x ${mount_dir}/etc/systemd/system-environment-generators/20-python
 
-cat << EOF > ${MNTDIR}/etc/profile.d/python.sh
+cat << EOF > ${mount_dir}/etc/profile.d/python.sh
 #!/bin/sh
 export PYTHONDONTWRITEBYTECODE=1 PYTHONSTARTUP=/usr/lib/pythonstartup
 EOF
 
-cat << EOF > ${MNTDIR}/usr/lib/pythonstartup
+cat << EOF > ${mount_dir}/usr/lib/pythonstartup
 import readline
 import time
 
@@ -121,6 +120,10 @@ EOF
 chroot ${mount_dir} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
+
+sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+locale-gen
+
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools busybox
 apt install -y freeipa-server freeipa-server-dns freeipa-server-trust-ad python3-incremental
@@ -133,9 +136,10 @@ systemctl disable $disable_services
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
-find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 "
 
+find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
+echo 'LC_ALL="en_US.UTF-8"' >> ${mount_dir}/etc/default/locale
 echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
 
 sync ${mount_dir}
