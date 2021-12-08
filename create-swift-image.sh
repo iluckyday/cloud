@@ -4,12 +4,8 @@ set -e
 include_apps="systemd,systemd-sysv,openssh-server,ca-certificates,bash-completion"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
-disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer e2scrub_reap.service"
-disable_services+=" memcached rsync \
-swift-proxy \
-swift-account-auditor swift-account-replicator swift-account \
-swift-container-auditor swift-container-replicator swift-container-updater swift-container \
-swift-object-auditor swift-object-replicator swift-object-updater swift-object"
+disable_services="apt-daily.timer apt-daily-upgrade.timer fstrim.timer e2scrub_all.timer e2scrub_reap.service"
+disable_services+=" remote-fs.target memcached rsync"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -139,7 +135,8 @@ systemctl enable $enable_services
 systemctl disable $disable_services
 
 sed -i '/src/d' /etc/apt/sources.list
-rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
+rm -rf /etc/systemd/system/multi-user.target.wants/swift-*
+rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/*/kernel/drivers/net/ethernet/ /boot/System.map-*
 "
 
 find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
