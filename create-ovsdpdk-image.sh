@@ -117,7 +117,7 @@ find /usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'en' -prune -exec rm -rf {} +
 "
 
 echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
-echo 'dpdk' > ${mount_dir}/etc/hostname
+echo 'ovsdpdk' > ${mount_dir}/etc/hostname
 
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
@@ -128,4 +128,4 @@ umount ${mount_dir}
 sleep 1
 losetup -d $loopx
 
-qemu-img convert -c -f raw -O qcow2 /tmp/sid.raw /tmp/dpdk.img
+qemu-img convert -c -f raw -O qcow2 /tmp/sid.raw /tmp/ovsdpdk.img
