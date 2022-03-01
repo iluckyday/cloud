@@ -22,7 +22,7 @@ ${rootpath}/bin/arch-chroot ${rootpath} /bin/bash -c "
 pacman-key --init
 pacman-key --populate archlinux
 mount $loopx /mnt
-/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
+/usr/bin/pacstrap -i -c /mnt linux grub base bash-completion openssh qemu-guest-agent --noconfirm --cachedir /tmp --ignore dhcpcd --ignore logrotate --ignore nano --ignore netctl --ignore usbutils --ignore s-nail
 "
 
 root_dir=${rootpath}/mnt
@@ -87,7 +87,7 @@ echo 'GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt console=ttyS0 console=
 
 chroot ${root_dir} /bin/bash -c "
 cp /etc/skel/.bash_profile /root
-systemctl enable systemd-networkd systemd-resolved sshd
+systemctl enable systemd-networkd systemd-resolved sshd qemu-guest-agent
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 mkinitcpio -S autodetect -z zstd -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
