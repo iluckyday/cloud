@@ -6,7 +6,7 @@ MIRROR=${MIRROR:-http://archive.ubuntu.com/ubuntu}
 LINUX_KERNEL=linux-image-kvm
 
 include_apps="systemd,systemd-sysv,ca-certificates,openssh-server"
-include_apps+=",${LINUX_KERNEL},extlinux,initramfs-tools,busybox"
+include_apps+=",${LINUX_KERNEL},extlinux,initramfs-tools"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="fstrim.timer motd-news.timer systemd-timesyncd.service"
 
@@ -105,7 +105,6 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2h
 chmod 600 ${TARGET_DIR}/root/.ssh/authorized_keys
 
 chroot ${TARGET_DIR} /bin/bash -c "
-sed -i 's/root:\*:/root::/' etc/shadow
 systemctl enable $enable_services
 systemctl disable $disable_services
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx

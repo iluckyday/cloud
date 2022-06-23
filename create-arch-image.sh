@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -98,7 +98,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 rm -rf /usr/share/zoneinfo/*
 rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
-dd if=/dev/zero of=/tmp/bigfile
+dd if=/dev/zero of=/tmp/bigfile || true
 sync
 sync
 rm /tmp/bigfile
