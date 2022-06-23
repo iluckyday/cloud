@@ -3,7 +3,7 @@
 apt update
 apt install -y qemu-utils
 
-qemu-img create -f raw /tmp/alpine.raw 20G
+qemu-img create -f raw /tmp/alpine.raw 2G
 dev=$(losetup --show -f /tmp/alpine.raw)
 mkfs.ext4 -F -L alpine-root -b 1024 -I 128 -O "^has_journal" $dev
 
@@ -59,6 +59,17 @@ mkdir -p ${mount_dir}/root/.ssh
 echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys
 chmod 600 ${mount_dir}/root/.ssh/authorized_keys
 
+cat << EOF > ${mount_dir}/boot/extlinux.conf
+PROMPT 0
+TIMEOUT 0
+DEFAULT alpine
+
+LABEL alpine
+    LINUX vmlinuz-virt
+    INITRD initramfs-virt
+    APPEND root=LABEL=alpine-root modules=ext4 quiet
+EOF
+
 chroot ${mount_dir} /bin/sh -c "
 echo "root:root" | chpasswd
 echo nameserver 8.8.8.8 > /etc/resolv.conf
@@ -79,18 +90,13 @@ rc-update add sshd boot
 rc-update add qemu-guest-agent boot
 rc-update add mount-ro shutdown
 rc-update add killprocs shutdown
+dd if=/dev/zero of=/tmp/bigfile
+sync
+sync
+rm /tmp/bigfile
+sync
+sync
 "
-cat << EOF > ${mount_dir}/boot/extlinux.conf
-PROMPT 0
-TIMEOUT 0
-DEFAULT alpine
-
-LABEL alpine
-    LINUX vmlinuz-virt
-    INITRD initramfs-virt
-    APPEND root=LABEL=alpine-root modules=ext4 quiet
-EOF
-
 
 sync ${mount_dir}
 sleep 1

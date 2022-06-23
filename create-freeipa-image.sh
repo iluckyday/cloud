@@ -14,7 +14,7 @@ apt install -y debootstrap qemu-utils
 
 mount_dir=/tmp/debian
 
-qemu-img create -f raw /tmp/sid.raw 201G
+qemu-img create -f raw /tmp/sid.raw 2G
 loopx=$(losetup --show -f -P /tmp/sid.raw)
 
 mkfs.ext4 -F -L debian-root -b 1024 -I 128 -O "^has_journal" $loopx
@@ -117,6 +117,10 @@ LABEL debian
         APPEND root=LABEL=debian-root quiet intel_iommu=on iommu=pt
 EOF
 
+find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
+echo 'LC_ALL="en_US.UTF-8"' >> ${mount_dir}/etc/default/locale
+echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
+
 chroot ${mount_dir} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' etc/shadow
@@ -136,11 +140,13 @@ systemctl disable $disable_services
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/5.6.0-2-cloud-amd64/kernel/drivers/net/ethernet/ /boot/System.map-*
+dd if=/dev/zero of=/tmp/bigfile
+sync
+sync
+rm /tmp/bigfile
+sync
+sync
 "
-
-find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
-echo 'LC_ALL="en_US.UTF-8"' >> ${mount_dir}/etc/default/locale
-echo 'nameserver 1.1.1.1' > ${mount_dir}/etc/resolv.conf
 
 sync ${mount_dir}
 umount ${mount_dir}/dev ${mount_dir}/proc ${mount_dir}/sys
