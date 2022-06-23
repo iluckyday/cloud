@@ -11,7 +11,7 @@ curl -skL https://mirror.rackspace.com/archlinux/iso/latest/${bootstrap_file} | 
 
 rootpath=/tmp/root.x86_64
 
-qemu-img create -f raw /tmp/arch.raw 10G
+qemu-img create -f raw /tmp/arch.raw 2G
 loopx=$(losetup --show -f -P /tmp/arch.raw)
 mkfs.ext4 -F -L arch-root -b 1024 -I 128 -O "^has_journal" $loopx
 

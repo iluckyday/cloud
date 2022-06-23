@@ -1,0 +1,23 @@
+name: mmdebstrap-ubuntu-lts
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron:  "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Build
+        run: sudo /bin/bash mmdebstrap-ubuntu-lts.sh
+
+      - name: Push to wetransfer
+        env:
+          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
+          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
+        run: bash transfer.sh wet /tmp/ubuntu-lts-*.img

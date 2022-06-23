@@ -140,7 +140,7 @@ systemctl disable $disable_services
 
 sed -i '/src/d' /etc/apt/sources.list
 rm -rf /etc/systemd/system/multi-user.target.wants/swift-*
-rm -rf /etc/hostname /etc/resolv.conf /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/*/kernel/drivers/net/ethernet/ /boot/System.map-*
+rm -rf /etc/hostname /etc/localtime /usr/share/doc /usr/share/man /tmp/* /var/log/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/perl*.* /usr/bin/systemd-analyze /lib/modules/*/kernel/drivers/net/ethernet/ /boot/System.map-*
 dd if=/dev/zero of=/tmp/bigfile
 sync
 sync

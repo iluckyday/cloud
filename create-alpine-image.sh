@@ -3,7 +3,7 @@
 apt update
 apt install -y qemu-utils
 
-qemu-img create -f raw /tmp/alpine.raw 2G
+qemu-img create -f raw /tmp/alpine.raw 100G
 dev=$(losetup --show -f /tmp/alpine.raw)
 mkfs.ext4 -F -L alpine-root -b 1024 -I 128 -O "^has_journal" $dev
 
@@ -90,12 +90,6 @@ rc-update add sshd boot
 rc-update add qemu-guest-agent boot
 rc-update add mount-ro shutdown
 rc-update add killprocs shutdown
-dd if=/dev/zero of=/tmp/bigfile
-sync
-sync
-rm /tmp/bigfile
-sync
-sync
 "
 
 sync ${mount_dir}
