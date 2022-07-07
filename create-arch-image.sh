@@ -47,9 +47,13 @@ sed -i 's|#NoExtract   =|NoExtract   = *__pycache__* usr/share/doc/* usr/share/d
 cat << EOF > ${root_dir}/etc/systemd/network/20-dhcp.network
 [Match]
 Name=en*
+
 [Network]
 DHCP=yes
 IPv6AcceptRA=yes
+
+[DHCPv4]
+ClientIdentifier=mac
 EOF
 
 cat << EOF >> ${root_dir}/root/.bashrc
@@ -98,7 +102,6 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 rm -rf /usr/share/zoneinfo/*
 rm -rf /var/log/* /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/* /root/.cache/* /var/cache/pacman/* /var/lib/pacman/sync/*
-dd if=/dev/zero of=/tmp/bigfile || true
 "
 
 umount ${root_dir}/dev ${root_dir}/proc ${root_dir}/sys
