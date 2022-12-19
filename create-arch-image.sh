@@ -6,8 +6,7 @@ apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/
 apt update
 apt install -y qemu-utils
 
-bootstrap_file=$(curl -skL https://mirror.rackspace.com/archlinux/iso/latest/md5sums.txt | awk '/bootstrap/ {print $2}')
-curl -skL https://mirror.rackspace.com/archlinux/iso/latest/${bootstrap_file} | tar -xz -C /tmp
+curl -skL https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz | tar -xz -C /tmp
 
 rootpath=/tmp/root.x86_64
 
