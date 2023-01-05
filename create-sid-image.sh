@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-include_apps="systemd,systemd-sysv,bash-completion,openssh-server,ca-certificates"
+include_apps="systemd,systemd-sysv,dbus,bash-completion,openssh-server,ca-certificates"
 exclude_apps="unattended-upgrades"
 enable_services="systemd-networkd.service ssh.service"
 disable_services="apt-daily.timer apt-daily-upgrade.timer e2scrub_all.timer systemd-timesyncd.service e2scrub_reap.service"
