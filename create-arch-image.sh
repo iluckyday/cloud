@@ -73,6 +73,13 @@ done < /etc/systemd/system/masked.units
 EOF
 chmod +x ${root_dir}/etc/systemd/system-generators/masked-unit-generator
 
+mkdir -p ${root_dir}/etc/systemd/system/serial-getty@ttyS0.service.d
+cat << "EOF" > ${root_dir}/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin root - $TERM
+EOF
+
 cat << EOF > ${root_dir}/etc/systemd/system/masked.units
 lvm2-lvmetad.service
 lvm2-monitor.service
